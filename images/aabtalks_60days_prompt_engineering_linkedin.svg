@@ -1,0 +1,106 @@
+<svg width="100%" viewBox="0 0 690 690" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">ABTalks 60 Days Claude Challenge – Prompt Engineering LinkedIn Post</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">A square LinkedIn post showing a visual comparison of a weak prompt versus an engineered prompt, with Claude-inspired brown, beige, and cream tones.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Background: warm cream -->
+  <rect width="680" height="680" fill="#F5EFE4" rx="0" style="fill:rgb(245, 239, 228);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="680" height="6" fill="#7C5C3E" rx="0" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Badge: ABTalks -->
+  <rect x="40" y="28" width="170" height="28" rx="14" fill="#7C5C3E" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="125" y="47" text-anchor="middle" font-family="Georgia, serif" font-size="12" font-weight="600" fill="#F5EFE4" style="fill:rgb(245, 239, 228);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:600;text-anchor:middle;dominant-baseline:auto">ABTalks · 60 Days Claude</text>
+
+  <!-- Day label -->
+  <rect x="222" y="28" width="68" height="28" rx="14" fill="#C9A97A" opacity="0.35" style="fill:rgb(201, 169, 122);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.35;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="256" y="47" text-anchor="middle" font-family="Georgia, serif" font-size="12" font-weight="600" fill="#5C3D1E" style="fill:rgb(92, 61, 30);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:600;text-anchor:middle;dominant-baseline:auto">Challenge</text>
+
+  <!-- Main title -->
+  <text x="40" y="115" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#3B2410" letter-spacing="-1" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:42px;font-weight:700;text-anchor:start;dominant-baseline:auto">Prompt</text>
+  <text x="40" y="162" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#3B2410" letter-spacing="-1" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:42px;font-weight:700;text-anchor:start;dominant-baseline:auto">Engineering</text>
+
+  <!-- Subtitle -->
+  <text x="40" y="192" font-family="Georgia, serif" font-size="15" fill="#7C5C3E" font-style="italic" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:15px;font-weight:400;font-style:italic;text-anchor:start;dominant-baseline:auto">The skill that changes everything about using AI</text>
+
+  <!-- Divider line -->
+  <line x1="40" y1="208" x2="640" y2="208" stroke="#C9A97A" stroke-width="0.8" style="fill:rgb(0, 0, 0);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- LEFT card: Weak Prompt -->
+  <rect x="40" y="224" width="278" height="330" rx="14" fill="#EDE0CC" stroke="#C9A97A" stroke-width="1" style="fill:rgb(237, 224, 204);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Red dot indicator -->
+  <circle cx="66" cy="252" r="7" fill="#C0694A" style="fill:rgb(192, 105, 74);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="82" y="257" font-family="Georgia, serif" font-size="13" font-weight="600" fill="#7A3A20" style="fill:rgb(122, 58, 32);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:13px;font-weight:600;text-anchor:start;dominant-baseline:auto">Weak Prompt</text>
+
+  <!-- Prompt box -->
+  <rect x="58" y="270" width="242" height="50" rx="8" fill="#F5EFE4" stroke="#C9A97A" stroke-width="0.8" style="fill:rgb(245, 239, 228);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="72" y="291" font-family="Georgia, serif" font-size="12" fill="#5C3D1E" style="fill:rgb(92, 61, 30);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:400;text-anchor:start;dominant-baseline:auto">"Write something about</text>
+  <text x="72" y="308" font-family="Georgia, serif" font-size="12" fill="#5C3D1E" style="fill:rgb(92, 61, 30);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:400;text-anchor:start;dominant-baseline:auto">productivity"</text>
+
+  <!-- Arrow down -->
+  <line x1="179" y1="328" x2="179" y2="352" stroke="#C9A97A" stroke-width="1.5" marker-end="url(#arrow)" style="fill:rgb(0, 0, 0);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Output box -->
+  <rect x="58" y="358" width="242" height="130" rx="8" fill="#F5EFE4" stroke="#C9A97A" stroke-width="0.8" style="fill:rgb(245, 239, 228);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="72" y="380" font-family="Georgia, serif" font-size="11" fill="#8B7355" style="fill:rgb(139, 115, 85);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;text-anchor:start;dominant-baseline:auto">Output:</text>
+  <text x="72" y="400" font-family="Georgia, serif" font-size="11.5" fill="#5C3D1E" style="fill:rgb(92, 61, 30);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">Productivity is the ability to</text>
+  <text x="72" y="418" font-family="Georgia, serif" font-size="11.5" fill="#5C3D1E" style="fill:rgb(92, 61, 30);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">accomplish tasks efficiently...</text>
+  <text x="72" y="436" font-family="Georgia, serif" font-size="11" fill="#A08060" font-style="italic" style="fill:rgb(160, 128, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;font-style:italic;text-anchor:start;dominant-baseline:auto">Generic. Unfocused.</text>
+  <text x="72" y="454" font-family="Georgia, serif" font-size="11" fill="#A08060" font-style="italic" style="fill:rgb(160, 128, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;font-style:italic;text-anchor:start;dominant-baseline:auto">No clear audience or purpose.</text>
+  <text x="72" y="472" font-family="Georgia, serif" font-size="11" fill="#A08060" font-style="italic" style="fill:rgb(160, 128, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;font-style:italic;text-anchor:start;dominant-baseline:auto">Not ready to use.</text>
+
+  <!-- Bottom label -->
+  <rect x="78" y="500" width="202" height="34" rx="8" fill="#C9A97A" opacity="0.25" style="fill:rgb(201, 169, 122);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.25;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="179" y="522" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#7A3A20" style="fill:rgb(122, 58, 32);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">❌  Vague → Basic output</text>
+
+  <!-- RIGHT card: Engineered Prompt -->
+  <rect x="362" y="224" width="278" height="330" rx="14" fill="#EDE0CC" stroke="#7C5C3E" stroke-width="1.5" style="fill:rgb(237, 224, 204);stroke:rgb(124, 92, 62);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Green dot indicator -->
+  <circle cx="388" cy="252" r="7" fill="#4A7C59" style="fill:rgb(74, 124, 89);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="404" y="257" font-family="Georgia, serif" font-size="13" font-weight="600" fill="#2E5E3C" style="fill:rgb(46, 94, 60);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:13px;font-weight:600;text-anchor:start;dominant-baseline:auto">Engineered Prompt</text>
+
+  <!-- Prompt box -->
+  <rect x="380" y="270" width="242" height="68" rx="8" fill="#F5EFE4" stroke="#7C5C3E" stroke-width="0.8" style="fill:rgb(245, 239, 228);stroke:rgb(124, 92, 62);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="394" y="288" font-family="Georgia, serif" font-size="10.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:10.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">"Write a 150-word LinkedIn post</text>
+  <text x="394" y="304" font-family="Georgia, serif" font-size="10.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:10.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">for busy professionals about one</text>
+  <text x="394" y="320" font-family="Georgia, serif" font-size="10.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:10.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">habit. Conversational, end with</text>
+  <text x="394" y="334" font-family="Georgia, serif" font-size="10.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:10.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">a question."</text>
+
+  <!-- Arrow down -->
+  <line x1="501" y1="346" x2="501" y2="366" stroke="#7C5C3E" stroke-width="1.5" marker-end="url(#arrow)" style="fill:rgb(0, 0, 0);stroke:rgb(124, 92, 62);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Output box -->
+  <rect x="380" y="372" width="242" height="116" rx="8" fill="#F5EFE4" stroke="#7C5C3E" stroke-width="0.8" style="fill:rgb(245, 239, 228);stroke:rgb(124, 92, 62);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="394" y="393" font-family="Georgia, serif" font-size="11" fill="#8B7355" style="fill:rgb(139, 115, 85);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;text-anchor:start;dominant-baseline:auto">Output:</text>
+  <text x="394" y="412" font-family="Georgia, serif" font-size="11.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">One habit changed my mornings:</text>
+  <text x="394" y="430" font-family="Georgia, serif" font-size="11.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">writing 3 priorities before I open</text>
+  <text x="394" y="448" font-family="Georgia, serif" font-size="11.5" fill="#3B2410" style="fill:rgb(59, 36, 16);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11.5px;font-weight:400;text-anchor:start;dominant-baseline:auto">email. What's yours?</text>
+  <text x="394" y="468" font-family="Georgia, serif" font-size="11" fill="#4A7C59" font-style="italic" style="fill:rgb(74, 124, 89);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:11px;font-weight:400;font-style:italic;text-anchor:start;dominant-baseline:auto">Ready to post. Relevant.</text>
+
+  <!-- Bottom label -->
+  <rect x="400" y="500" width="202" height="34" rx="8" fill="#7C5C3E" opacity="0.2" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.2;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="501" y="522" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#2E5E3C" style="fill:rgb(46, 94, 60);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">✅  Clear → Better output</text>
+
+  <!-- VS badge in center -->
+  <circle cx="340" cy="390" r="22" fill="#7C5C3E" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="340" y="397" text-anchor="middle" font-family="Georgia, serif" font-size="15" font-weight="700" fill="#F5EFE4" style="fill:rgb(245, 239, 228);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:15px;font-weight:700;text-anchor:middle;dominant-baseline:auto">VS</text>
+
+  <!-- Bottom rule -->
+  <line x1="40" y1="572" x2="640" y2="572" stroke="#C9A97A" stroke-width="0.8" style="fill:rgb(0, 0, 0);stroke:rgb(201, 169, 122);color:rgb(255, 255, 255);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Bottom tagline -->
+  <text x="340" y="598" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#7C5C3E" font-style="italic" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:13px;font-weight:400;font-style:italic;text-anchor:middle;dominant-baseline:auto">Better prompts → Faster work · Sharper results · Unlocked AI potential</text>
+
+  <!-- Footer brand -->
+  <text x="40" y="648" font-family="Georgia, serif" font-size="12" fill="#A08060" style="fill:rgb(160, 128, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:400;text-anchor:start;dominant-baseline:auto">#PromptEngineering  #ABTalks  #60DaysClaude  #AISkills</text>
+  <text x="640" y="648" text-anchor="end" font-family="Georgia, serif" font-size="12" font-weight="600" fill="#7C5C3E" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:12px;font-weight:600;text-anchor:end;dominant-baseline:auto">@aabtalks</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="674" width="680" height="6" fill="#7C5C3E" rx="0" style="fill:rgb(124, 92, 62);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+</svg>
