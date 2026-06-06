@@ -256,7 +256,3 @@ Learn how it works, optimize your resume, and let your skills get the visibility
 
 #AIEngineering #ResumeOptimizer #ATS #CareerGrowth #JobSearch #ResumeWriting #LinkedInTips #ArtificialIntelligence #MachineLearning #CareerDevelopment #Students #Developers #TechCareers #60DaysOfAI #AIForJobs #PromptEngineering #ContextEngineering
 ````
-
-You can save this as:
-
-**`Day06_ATS_Resume_Optimizer.md`**
