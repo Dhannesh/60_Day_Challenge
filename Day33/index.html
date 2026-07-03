@@ -1,0 +1,1513 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Integrity Analyzer</title>
+    <style>
+      :root {
+        --bg: #141110;
+        --bg-alt: #1c1815;
+        --card: #211c19;
+        --card-hover: #2a231f;
+        --border: #3a322c;
+        --text: #f2ece6;
+        --text-dim: #b8ada3;
+        --text-faint: #7d7368;
+        --accent: #d97757;
+        --accent-soft: #d9775722;
+        --accent-strong: #eb8f6b;
+        --good: #7cb98c;
+        --warn: #e0b354;
+        --bad: #dd6b6b;
+        --radius: 16px;
+        --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background:
+          radial-gradient(circle at 15% 0%, #2a201a 0%, transparent 45%),
+          radial-gradient(circle at 85% 10%, #241e1a 0%, transparent 40%),
+          var(--bg);
+        color: var(--text);
+        font-family: "Georgia", "Iowan Old Style", serif;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+      .sans {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+      ::selection {
+        background: var(--accent-soft);
+        color: var(--text);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+      }
+
+      .app {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 100px;
+      }
+
+      /* Header */
+      .masthead {
+        text-align: center;
+        padding: 20px 0 30px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 32px;
+        animation: fadeDown 0.7s ease;
+      }
+      .masthead .kicker {
+        font-family: "Courier New", monospace;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      .masthead h1 {
+        font-size: 2.6rem;
+        margin: 0 0 8px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      .masthead p {
+        color: var(--text-dim);
+        font-size: 1.05rem;
+        max-width: 560px;
+        margin: 0 auto;
+      }
+
+      /* Progress */
+      .progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        animation: fadeIn 0.8s ease;
+      }
+      .progress-track {
+        flex: 1;
+        height: 6px;
+        background: var(--bg-alt);
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+        width: 0%;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 6px;
+      }
+      .progress-label {
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        color: var(--text-faint);
+        white-space: nowrap;
+      }
+
+      /* Metrics dashboard (live) */
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 34px;
+      }
+      .metric-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 12px;
+        text-align: center;
+        transition:
+          transform 0.3s ease,
+          border-color 0.3s ease,
+          background 0.3s ease;
+      }
+      .metric-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        background: var(--card-hover);
+      }
+      .metric-label {
+        font-family: -apple-system, sans-serif;
+        font-size: 10.5px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 6px;
+      }
+      .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: -apple-system, sans-serif;
+      }
+      .metric-bar {
+        margin-top: 8px;
+        height: 4px;
+        background: var(--bg-alt);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .metric-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.8s ease;
+      }
+
+      /* Cards / sections */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 28px 26px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+        animation: fadeUp 0.6s ease;
+      }
+      .lesson-card {
+        background:
+          linear-gradient(135deg, var(--accent-soft), transparent 60%),
+          var(--card);
+        border: 1px solid var(--border);
+      }
+      .lesson-card .eyebrow {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .lesson-card h2 {
+        margin: 0 0 12px;
+        font-size: 1.5rem;
+      }
+      .lesson-card p {
+        color: var(--text-dim);
+        margin: 0 0 10px;
+        font-size: 0.98rem;
+      }
+      .lesson-card .why-box {
+        background: var(--bg-alt);
+        border-left: 3px solid var(--accent);
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin-top: 14px;
+        font-size: 0.92rem;
+        color: var(--text-dim);
+      }
+
+      .btn {
+        font-family: -apple-system, sans-serif;
+        background: var(--accent);
+        color: #1c1310;
+        border: none;
+        padding: 13px 26px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+        box-shadow: 0 4px 14px rgba(217, 119, 87, 0.25);
+      }
+      .btn:hover {
+        background: var(--accent-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(217, 119, 87, 0.35);
+      }
+      .btn:active {
+        transform: translateY(0px);
+      }
+      .btn.secondary {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        box-shadow: none;
+      }
+      .btn.secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-soft);
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Article mock */
+      .article-mock {
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin: 18px 0;
+      }
+      .article-mock .source-tag {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        color: var(--text-faint);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+      .article-mock h3 {
+        font-size: 1.4rem;
+        margin: 0 0 12px;
+        line-height: 1.35;
+      }
+      .article-mock .body-text {
+        color: var(--text-dim);
+        font-size: 0.98rem;
+      }
+      .social-mock {
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 22px;
+        margin: 18px 0;
+      }
+      .social-mock .handle {
+        font-family: -apple-system, sans-serif;
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+      .social-mock .caption {
+        font-size: 1.05rem;
+        color: var(--text);
+      }
+
+      .highlight {
+        background: linear-gradient(
+          180deg,
+          transparent 60%,
+          var(--accent-soft) 60%
+        );
+        padding: 0 2px;
+        border-radius: 3px;
+        cursor: help;
+        transition: background 0.2s ease;
+      }
+      .highlight:hover {
+        background: linear-gradient(180deg, transparent 55%, #d9775755 55%);
+      }
+      .highlight.bad {
+        background: linear-gradient(180deg, transparent 60%, #dd6b6b33 60%);
+      }
+      .highlight.bad:hover {
+        background: linear-gradient(180deg, transparent 55%, #dd6b6b55 55%);
+      }
+
+      /* Choice buttons */
+      .choice-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 18px 0;
+      }
+      .choice-btn {
+        font-family: -apple-system, sans-serif;
+        flex: 1;
+        min-width: 110px;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      .choice-btn:hover {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        transform: translateY(-2px);
+      }
+      .choice-btn.selected {
+        background: var(--accent);
+        color: #1c1310;
+        border-color: var(--accent);
+      }
+
+      textarea.reflect {
+        width: 100%;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-family: -apple-system, sans-serif;
+        padding: 14px;
+        font-size: 0.9rem;
+        resize: vertical;
+        min-height: 70px;
+        margin-top: 10px;
+      }
+      textarea.reflect:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 14px 0;
+      }
+      .word-chip {
+        font-family: -apple-system, sans-serif;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+      .word-chip:hover {
+        border-color: var(--accent);
+      }
+      .word-chip.picked {
+        background: var(--accent);
+        color: #1c1310;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+
+      /* Reveal panel */
+      .reveal {
+        margin-top: 22px;
+        padding-top: 22px;
+        border-top: 1px dashed var(--border);
+        animation: fadeUp 0.5s ease;
+      }
+      .reveal h4 {
+        font-family: -apple-system, sans-serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--accent);
+        margin: 0 0 8px;
+      }
+      .score-badge {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        padding: 10px 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+      }
+      .score-badge .num {
+        font-family: -apple-system, sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+      }
+      .score-badge .denom {
+        font-family: -apple-system, sans-serif;
+        color: var(--text-faint);
+        font-size: 1rem;
+      }
+      .info-block {
+        background: var(--bg-alt);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        font-size: 0.92rem;
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+      }
+      .info-block b {
+        color: var(--text);
+      }
+      .rewrite-box {
+        border: 1px solid var(--good);
+        background: #7cb98c11;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 14px 0;
+        font-size: 1rem;
+        font-style: italic;
+      }
+      .takeaway-box {
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        padding: 14px 18px;
+        border-radius: 0 10px 10px 0;
+        margin-top: 16px;
+        font-size: 0.95rem;
+      }
+
+      .pill {
+        display: inline-block;
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .pill.good {
+        background: #7cb98c22;
+        color: var(--good);
+      }
+      .pill.warn {
+        background: #e0b35422;
+        color: var(--warn);
+      }
+      .pill.bad {
+        background: #dd6b6b22;
+        color: var(--bad);
+      }
+
+      /* Dashboard */
+      .dashboard-hero {
+        text-align: center;
+        padding: 20px 0 10px;
+      }
+      .dashboard-hero .ring-wrap {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 16px;
+      }
+      .dashboard-hero svg {
+        transform: rotate(-90deg);
+      }
+      .dashboard-hero .ring-bg {
+        fill: none;
+        stroke: var(--bg-alt);
+        stroke-width: 12;
+      }
+      .dashboard-hero .ring-fill {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 12;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .dashboard-hero .ring-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font-family: -apple-system, sans-serif;
+      }
+      .dashboard-hero .ring-text .big {
+        font-size: 2.4rem;
+        font-weight: 800;
+      }
+      .dashboard-hero .ring-text .small {
+        font-size: 11px;
+        color: var(--text-faint);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .habit-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .habit-card {
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        transition:
+          transform 0.3s ease,
+          border-color 0.3s ease;
+      }
+      .habit-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+      }
+      .habit-card .icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+      }
+      .habit-card .title {
+        font-family: -apple-system, sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+      .habit-card .desc {
+        font-size: 0.82rem;
+        color: var(--text-faint);
+        font-family: -apple-system, sans-serif;
+      }
+
+      .redflag-box {
+        background: #dd6b6b15;
+        border: 1px solid #dd6b6b44;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 18px 0;
+      }
+      .redflag-box .label {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--bad);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .center {
+        text-align: center;
+      }
+      .btn-row {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 28px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      footer.foot {
+        text-align: center;
+        color: var(--text-faint);
+        font-size: 0.8rem;
+        font-family: -apple-system, sans-serif;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes fadeDown {
+        from {
+          opacity: 0;
+          transform: translateY(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      .pulse {
+        animation: pulse 1.8s ease infinite;
+      }
+
+      @media (max-width: 640px) {
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .habit-grid {
+          grid-template-columns: 1fr;
+        }
+        .masthead h1 {
+          font-size: 2rem;
+        }
+        .choice-row {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="masthead">
+        <div class="kicker sans">Media Literacy Lab</div>
+        <h1>Media Integrity Analyzer</h1>
+        <p class="sans">
+          A guided walkthrough for spotting spin, hype, and manipulation in
+          headlines and posts — before you decide the answers are revealed.
+        </p>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">Step 1 of 3</div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label sans">Headline Accuracy</div>
+          <div class="metric-value" id="mHeadline">—</div>
+          <div class="metric-bar">
+            <div
+              class="metric-bar-fill"
+              id="mHeadlineBar"
+              style="width: 0%; background: var(--accent)"
+            ></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label sans">Source Reliability</div>
+          <div class="metric-value" id="mSource">—</div>
+          <div class="metric-bar">
+            <div
+              class="metric-bar-fill"
+              id="mSourceBar"
+              style="width: 0%; background: var(--good)"
+            ></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label sans">Emotional Manipulation</div>
+          <div class="metric-value" id="mEmotion">—</div>
+          <div class="metric-bar">
+            <div
+              class="metric-bar-fill"
+              id="mEmotionBar"
+              style="width: 0%; background: var(--bad)"
+            ></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label sans">Audience Targeting</div>
+          <div class="metric-value" id="mAudience">—</div>
+          <div class="metric-bar">
+            <div
+              class="metric-bar-fill"
+              id="mAudienceBar"
+              style="width: 0%; background: var(--warn)"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SCREEN 1: INTRO ===================== -->
+      <div id="screen-intro">
+        <div class="card lesson-card">
+          <div class="eyebrow sans">Welcome</div>
+          <h2>Learn to read between the headlines</h2>
+          <p>
+            Every day, headlines and posts compete for a few seconds of your
+            attention. Some are honest. Some stretch the truth. Some are built
+            entirely to trigger a feeling before you've read a single fact.
+          </p>
+          <p>
+            This lab won't quiz you on media literacy facts. Instead, you'll
+            look at real-style examples, form your own reaction first, and then
+            we'll reveal what's actually happening underneath — so the lesson
+            sticks.
+          </p>
+          <div class="why-box">
+            Two short challenges. No prior knowledge needed. Just your
+            instincts.
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="goToChallenge(1)">
+              Start the Lesson →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SCREEN 2: CHALLENGE 1 ===================== -->
+      <div id="screen-c1" class="hidden">
+        <div class="card lesson-card">
+          <div class="eyebrow sans">Concept · Headline Accuracy</div>
+          <h2>Challenge 1: Headline Detective</h2>
+          <p>
+            Headlines are written to make you click — that's their job. But
+            there's a difference between an <i>interesting</i> headline and a
+            <i>misleading</i> one. Misleading headlines exaggerate, omit
+            context, or imply something the article doesn't actually support.
+          </p>
+          <div class="why-box">
+            Why it matters: if you only ever read headlines (most people do), a
+            misleading one can plant a false belief in seconds — and that belief
+            often survives even after you learn the truth.
+          </div>
+        </div>
+
+        <div class="card" id="c1-article-card">
+          <div class="article-mock">
+            <div class="source-tag sans" id="c1-source">DAILY PULSE NEWS</div>
+            <h3 id="c1-headline"></h3>
+            <div class="body-text" id="c1-body"></div>
+          </div>
+
+          <div class="sans" style="font-weight: 700; margin-top: 20px">
+            Would you click this headline?
+          </div>
+          <div class="choice-row" id="c1-choices">
+            <button class="choice-btn" data-choice="Yes">Yes</button>
+            <button class="choice-btn" data-choice="Maybe">Maybe</button>
+            <button class="choice-btn" data-choice="No">No</button>
+          </div>
+
+          <div class="sans" style="font-weight: 700; margin-top: 14px">
+            Which words or phrases feel exaggerated or misleading? (tap any)
+          </div>
+          <div class="tag-row" id="c1-wordchips"></div>
+
+          <div class="btn-row">
+            <button
+              class="btn"
+              id="c1-reveal-btn"
+              onclick="revealC1()"
+              disabled
+            >
+              Reveal the Analysis
+            </button>
+          </div>
+
+          <div class="reveal hidden" id="c1-reveal">
+            <h4 class="sans">Headline Accuracy Score</h4>
+            <div class="score-badge">
+              <span class="num" id="c1-score">0</span
+              ><span class="denom">/ 100</span>
+            </div>
+
+            <div class="info-block">
+              <b>What was exaggerated:</b> <span id="c1-mismatch"></span>
+            </div>
+            <div class="info-block">
+              <b>Why this works on readers:</b> <span id="c1-explain"></span>
+            </div>
+
+            <h4 class="sans" style="margin-top: 18px">A Fairer Headline</h4>
+            <div class="rewrite-box" id="c1-fair"></div>
+
+            <div class="takeaway-box">
+              <b class="sans">Key takeaway:</b> <span id="c1-takeaway"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row hidden" id="c1-next-row">
+          <button class="btn" onclick="goToChallenge(2)">
+            Continue to Challenge 2 →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================== SCREEN 3: CHALLENGE 2 ===================== -->
+      <div id="screen-c2" class="hidden">
+        <div class="card lesson-card">
+          <div class="eyebrow sans">Concept · Emotional Manipulation</div>
+          <h2>Challenge 2: Emotion Detector</h2>
+          <p>
+            Some content isn't trying to inform you at all — it's trying to make
+            you <i>feel</i> something fast: outrage, fear, envy, urgency. That
+            feeling makes you share, comment, or buy before you've thought it
+            through.
+          </p>
+          <div class="why-box">
+            Why it matters: content that triggers strong emotion spreads faster
+            than calm, accurate content — which is exactly why so much of what
+            goes viral is engineered to provoke, not inform.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="social-mock">
+            <div class="handle sans" id="c2-handle">@dailyspark</div>
+            <div class="caption" id="c2-caption"></div>
+          </div>
+
+          <div class="sans" style="font-weight: 700; margin-top: 20px">
+            How did reading this make you feel?
+          </div>
+          <div class="choice-row" id="c2-feelings">
+            <button class="choice-btn" data-choice="Anxious">Anxious</button>
+            <button class="choice-btn" data-choice="Angry">Angry</button>
+            <button class="choice-btn" data-choice="Envious">Envious</button>
+            <button class="choice-btn" data-choice="Excited">Excited</button>
+            <button class="choice-btn" data-choice="Nothing much">
+              Nothing much
+            </button>
+          </div>
+
+          <div class="sans" style="font-weight: 700; margin-top: 14px">
+            Which words influenced that feeling? (tap any)
+          </div>
+          <div class="tag-row" id="c2-wordchips"></div>
+
+          <textarea
+            class="reflect"
+            id="c2-reflection"
+            placeholder="Optional: in one sentence, why do you think it was written this way?"
+          ></textarea>
+
+          <div class="btn-row">
+            <button
+              class="btn"
+              id="c2-reveal-btn"
+              onclick="revealC2()"
+              disabled
+            >
+              Reveal the Analysis
+            </button>
+          </div>
+
+          <div class="reveal hidden" id="c2-reveal">
+            <h4 class="sans">Who This Targets</h4>
+            <div class="info-block">
+              <b>Likely target audience:</b> <span id="c2-audience"></span>
+            </div>
+            <div class="info-block">
+              <b>Intended emotional response:</b> <span id="c2-intended"></span>
+            </div>
+            <div class="info-block">
+              <b>Manipulation technique:</b> <span id="c2-technique"></span>
+            </div>
+
+            <h4 class="sans" style="margin-top: 18px">
+              Emotional Language Used
+            </h4>
+            <p id="c2-highlighted" style="font-size: 1rem"></p>
+
+            <h4 class="sans" style="margin-top: 18px">A Neutral Rewrite</h4>
+            <div class="rewrite-box" id="c2-neutral"></div>
+
+            <div class="takeaway-box">
+              <b class="sans">Key takeaway:</b> <span id="c2-takeaway"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row hidden" id="c2-next-row">
+          <button class="btn" onclick="goToDashboard()">
+            See My Media Integrity Dashboard →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================== SCREEN 4: DASHBOARD ===================== -->
+      <div id="screen-dash" class="hidden">
+        <div class="card">
+          <div class="dashboard-hero">
+            <div
+              class="eyebrow sans center"
+              style="
+                color: var(--accent);
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                font-size: 11px;
+                font-weight: 700;
+              "
+            >
+              Media Integrity Dashboard
+            </div>
+            <div class="ring-wrap">
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle class="ring-bg" cx="90" cy="90" r="78"></circle>
+                <circle
+                  class="ring-fill"
+                  id="ringFill"
+                  cx="90"
+                  cy="90"
+                  r="78"
+                  stroke-dasharray="490"
+                  stroke-dashoffset="490"
+                ></circle>
+              </svg>
+              <div class="ring-text">
+                <div class="big" id="overallScore">0</div>
+                <div class="small">Overall Score</div>
+              </div>
+            </div>
+            <p
+              class="sans"
+              id="overallVerdict"
+              style="color: var(--text-dim); max-width: 480px; margin: 0 auto"
+            ></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4
+            class="sans"
+            style="
+              color: var(--accent);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              font-size: 0.8rem;
+            "
+          >
+            What You Learned
+          </h4>
+          <div class="info-block" id="learnedSummary"></div>
+
+          <div class="redflag-box">
+            <div class="label sans">Biggest Red Flag You Encountered</div>
+            <div id="biggestRedFlag"></div>
+          </div>
+
+          <h4
+            class="sans"
+            style="
+              color: var(--accent);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              font-size: 0.8rem;
+              margin-top: 22px;
+            "
+          >
+            Three Habits to Build
+          </h4>
+          <div class="habit-grid">
+            <div class="habit-card">
+              <div class="icon">🔍</div>
+              <div class="title sans">Read Past the Headline</div>
+              <div class="desc">
+                Before reacting, open the article and check if the body actually
+                supports the claim.
+              </div>
+            </div>
+            <div class="habit-card">
+              <div class="icon">⏸️</div>
+              <div class="title sans">Pause on Strong Emotion</div>
+              <div class="desc">
+                If a post makes you feel outrage or urgency instantly, that's a
+                signal to slow down, not share.
+              </div>
+            </div>
+            <div class="habit-card">
+              <div class="icon">🧭</div>
+              <div class="title sans">Ask "Who Benefits?"</div>
+              <div class="desc">
+                Consider who gains from you clicking, sharing, or feeling this
+                way — attention, sales, or outrage.
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn" onclick="restartApp()">
+              🔁 Replay with New Scenarios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="foot">
+        Media Integrity Analyzer · An offline, single-file media literacy
+        exercise · Educational fiction only, all examples generated for
+        learning.
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        /* ---------------- CONTENT BANKS ---------------- */
+        const headlineBank = [
+          {
+            source: "THE DAILY PULSE",
+            headline:
+              "Local Coffee Shop Owner Reveals Shocking Secret That Big Corporations Don't Want You To Know",
+            body: "A small coffee shop in the downtown district has started roasting its own beans in-house. The owner, who has run the shop for six years, says the change came after customers asked for fresher options. Roasting on-site typically costs more but can improve flavor. The shop has not made any claims about corporate conspiracies.",
+            exaggerated: [
+              "Shocking Secret",
+              "Big Corporations Don't Want You To Know",
+            ],
+            mismatchExplain:
+              "The article is simply about a shop starting to roast its own beans — a normal business decision. There is no 'secret,' no conspiracy, and nothing corporations are hiding.",
+            whyWorks:
+              "Words like 'shocking secret' and 'don't want you to know' trigger curiosity and a sense of being let in on hidden knowledge — a classic clickbait pattern that has nothing to do with the actual, mundane story.",
+            score: 28,
+            fair: "Local Coffee Shop Starts Roasting Its Own Beans In-House",
+            takeaway:
+              "If a headline promises a 'secret' or 'they don't want you to know,' check whether the article actually reveals anything hidden — often it doesn't.",
+          },
+          {
+            source: "URBAN WIRE DAILY",
+            headline:
+              "City Traffic Study Proves Commutes Are Getting Worse For Everyone, Experts Warn",
+            body: "A new city transportation report found that average commute times increased by 4 minutes over the past two years in three of the city's twelve districts, largely due to ongoing construction. The other nine districts saw times stay flat or slightly improve. The report recommends targeted fixes in the affected areas.",
+            exaggerated: ["Proves", "Worse For Everyone", "Experts Warn"],
+            mismatchExplain:
+              "The data shows a 4-minute increase in only 3 of 12 districts, tied to specific construction — not a citywide, universal worsening. 'Everyone' is not supported by the report.",
+            whyWorks:
+              "Absolute words like 'everyone' and authoritative framing like 'proves' and 'experts warn' make a limited, localized finding sound like a sweeping, urgent crisis affecting the whole audience personally.",
+            score: 34,
+            fair: "Commute Times Rise in 3 City Districts Due to Construction, New Report Finds",
+            takeaway:
+              "Watch for absolute words like 'everyone,' 'always,' or 'proves' — real data is almost always more limited and specific than that.",
+          },
+          {
+            source: "SPARK NEWS NETWORK",
+            headline:
+              "New Study: Drinking This One Common Drink Could Be Silently Damaging Your Health",
+            body: "Researchers found that participants who drank more than six cups of a highly caffeinated energy drink per day reported higher rates of sleep disruption in a small, self-reported survey of 120 people. The study did not establish causation and noted that six cups per day is far above typical consumption.",
+            exaggerated: [
+              "Silently Damaging Your Health",
+              "This One Common Drink",
+            ],
+            mismatchExplain:
+              "The actual finding is a small, self-reported association between very high consumption (6+ cups/day) of one specific drink type and sleep issues — not a proven health-damaging effect for typical use.",
+            whyWorks:
+              "Vague fear language ('silently damaging') combined with withholding the drink's name creates anxiety and curiosity, pushing readers to click even though the real study is narrow and inconclusive.",
+            score: 22,
+            fair: "Small Study Links Very High Energy Drink Consumption to Sleep Disruption",
+            takeaway:
+              "Health headlines that hide the specific detail ('this one drink,' 'this common habit') are often exaggerating a narrow, preliminary finding into a scary universal warning.",
+          },
+        ];
+
+        const socialBank = [
+          {
+            handle: "@wealthmindset.daily",
+            caption:
+              "She quit her 9-to-5 at 24 and now she's living the life you're too scared to even try for. While you're scrolling, she's WINNING. Comment 'READY' if you're finally done being average. ⏰ Link in bio before this disappears.",
+            emotionalWords: [
+              "too scared",
+              "WINNING",
+              "done being average",
+              "before this disappears",
+            ],
+            audience:
+              "Young adults feeling stuck in their careers or comparing themselves to others online, especially those anxious about being 'behind' in life.",
+            intended:
+              "A mix of envy, inadequacy, and urgency — designed to make the reader feel behind in life and afraid of missing out.",
+            technique:
+              "Social comparison + FOMO (fear of missing out) + false scarcity ('before this disappears') to drive fast, emotional action instead of thoughtful decision-making.",
+            neutral:
+              "A 24-year-old shares that she left her full-time job to pursue independent work. She offers a course on the topic, linked in her bio.",
+            takeaway:
+              "Posts that pit you against an anonymous 'winning' stranger and add a countdown are usually selling something — the urgency is manufactured, not real.",
+          },
+          {
+            handle: "@newsflashnow",
+            caption:
+              "BREAKING: Prices are about to SKYROCKET and no one is talking about it. If you don't act THIS WEEK you will regret it. Share this before it gets taken down.",
+            emotionalWords: [
+              "BREAKING",
+              "SKYROCKET",
+              "no one is talking about it",
+              "before it gets taken down",
+            ],
+            audience:
+              "People anxious about cost of living and personal finances, especially those who feel uninformed or afraid of missing important news.",
+            intended:
+              "Fear and urgency — meant to spike anxiety about money and create pressure to act or share immediately without verifying anything.",
+            technique:
+              "Manufactured urgency + implied censorship ('taken down', 'no one is talking about it') to bypass critical thinking and encourage impulsive sharing.",
+            neutral:
+              "A post claims prices may rise soon and urges readers to take financial action quickly, without citing a specific source.",
+            takeaway:
+              "Claims that something is being hidden or 'taken down soon' are a red flag — real news doesn't need artificial countdowns to be worth sharing.",
+          },
+          {
+            handle: "@fitlife.transform",
+            caption:
+              "This is what happens when you FINALLY stop making excuses. 30 days. No days off. If she can do it, what's YOUR excuse? Tag someone who needs to see this. 🔥",
+            emotionalWords: [
+              "FINALLY stop making excuses",
+              "No days off",
+              "what's YOUR excuse",
+              "🔥",
+            ],
+            audience:
+              "People with insecurities about their fitness or body image, especially those who feel guilty about missed workouts or goals.",
+            intended:
+              "Guilt and shame, framed as motivation — designed to make the viewer feel personally called out and inadequate.",
+            technique:
+              "Guilt-tripping disguised as inspiration, plus an implicit 'no rest ever' standard that isn't healthy or realistic, pushed to maximize shares via tagging.",
+            neutral:
+              "A fitness creator shares a 30-day workout routine and encourages followers to stay consistent with their goals.",
+            takeaway:
+              "Motivational content that makes you feel guilty rather than genuinely encouraged is often optimized for shares and comments, not your wellbeing.",
+          },
+        ];
+
+        /* ---------------- STATE ---------------- */
+        let state = {
+          c1: null,
+          c2: null,
+          c1Choice: null,
+          c1Words: [],
+          c2Choice: null,
+          c2Words: [],
+          metrics: {
+            headline: null,
+            source: null,
+            emotion: null,
+            audience: null,
+          },
+        };
+
+        function pick(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        /* ---------------- NAVIGATION ---------------- */
+        function setProgress(step) {
+          const pct = [8, 40, 72, 100][step];
+          document.getElementById("progressFill").style.width = pct + "%";
+          const labels = [
+            "Getting started",
+            "Step 1 of 3 — Headline Detective",
+            "Step 2 of 3 — Emotion Detector",
+            "Step 3 of 3 — Dashboard",
+          ];
+          document.getElementById("progressLabel").textContent = labels[step];
+        }
+
+        function hideAll() {
+          ["screen-intro", "screen-c1", "screen-c2", "screen-dash"].forEach(
+            (id) => {
+              document.getElementById(id).classList.add("hidden");
+            },
+          );
+        }
+
+        window.goToChallenge = function (n) {
+          hideAll();
+          if (n === 1) {
+            setProgress(1);
+            loadChallenge1();
+            document.getElementById("screen-c1").classList.remove("hidden");
+          } else if (n === 2) {
+            setProgress(2);
+            loadChallenge2();
+            document.getElementById("screen-c2").classList.remove("hidden");
+          }
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        window.goToDashboard = function () {
+          hideAll();
+          setProgress(3);
+          buildDashboard();
+          document.getElementById("screen-dash").classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        /* ---------------- CHALLENGE 1 ---------------- */
+        function loadChallenge1() {
+          const item = pick(headlineBank);
+          state.c1 = item;
+          state.c1Choice = null;
+          state.c1Words = [];
+
+          document.getElementById("c1-source").textContent = item.source;
+          document.getElementById("c1-headline").textContent = item.headline;
+          document.getElementById("c1-body").textContent = item.body;
+          document.getElementById("c1-reveal").classList.add("hidden");
+          document.getElementById("c1-next-row").classList.add("hidden");
+          document.getElementById("c1-reveal-btn").disabled = true;
+
+          // reset choice buttons
+          document
+            .querySelectorAll("#c1-choices .choice-btn")
+            .forEach((btn) => {
+              btn.classList.remove("selected");
+              btn.onclick = function () {
+                document
+                  .querySelectorAll("#c1-choices .choice-btn")
+                  .forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                state.c1Choice = btn.dataset.choice;
+                checkC1Ready();
+              };
+            });
+
+          // build word chips from headline words (shuffled, include exaggerated + some neutral words)
+          const words = item.headline
+            .replace(/[^\w\s]/g, "")
+            .split(" ")
+            .filter((w) => w.length > 3);
+          const uniqueWords = [...new Set(words)];
+          const chipWrap = document.getElementById("c1-wordchips");
+          chipWrap.innerHTML = "";
+          uniqueWords.slice(0, 10).forEach((w) => {
+            const chip = document.createElement("div");
+            chip.className = "word-chip sans";
+            chip.textContent = w;
+            chip.onclick = function () {
+              chip.classList.toggle("picked");
+              if (chip.classList.contains("picked")) {
+                state.c1Words.push(w);
+              } else {
+                state.c1Words = state.c1Words.filter((x) => x !== w);
+              }
+            };
+            chipWrap.appendChild(chip);
+          });
+        }
+
+        function checkC1Ready() {
+          document.getElementById("c1-reveal-btn").disabled = !state.c1Choice;
+        }
+
+        window.revealC1 = function () {
+          const item = state.c1;
+          document.getElementById("c1-score").textContent = item.score;
+          document.getElementById("c1-mismatch").innerHTML = item.exaggerated
+            .map((w) => `<span class="pill bad">${w}</span>`)
+            .join(" ");
+          document.getElementById("c1-explain").textContent =
+            item.whyWorks + " " + item.mismatchExplain;
+          document.getElementById("c1-fair").textContent = item.fair;
+          document.getElementById("c1-takeaway").textContent = item.takeaway;
+
+          document.getElementById("c1-reveal").classList.remove("hidden");
+          document.getElementById("c1-next-row").classList.remove("hidden");
+          document.getElementById("c1-reveal-btn").disabled = true;
+
+          // update live metrics
+          state.metrics.headline = item.score;
+          state.metrics.source = Math.min(
+            95,
+            item.score + 15 + Math.floor(Math.random() * 10),
+          );
+          updateMetric(
+            "headline",
+            state.metrics.headline,
+            document.getElementById("mHeadlineBar"),
+          );
+          updateMetric(
+            "source",
+            state.metrics.source,
+            document.getElementById("mSourceBar"),
+          );
+
+          document
+            .getElementById("c1-reveal")
+            .scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
+
+        /* ---------------- CHALLENGE 2 ---------------- */
+        function loadChallenge2() {
+          const item = pick(socialBank);
+          state.c2 = item;
+          state.c2Choice = null;
+          state.c2Words = [];
+
+          document.getElementById("c2-handle").textContent = item.handle;
+          document.getElementById("c2-caption").textContent = item.caption;
+          document.getElementById("c2-reveal").classList.add("hidden");
+          document.getElementById("c2-next-row").classList.add("hidden");
+          document.getElementById("c2-reveal-btn").disabled = true;
+          document.getElementById("c2-reflection").value = "";
+
+          document
+            .querySelectorAll("#c2-feelings .choice-btn")
+            .forEach((btn) => {
+              btn.classList.remove("selected");
+              btn.onclick = function () {
+                document
+                  .querySelectorAll("#c2-feelings .choice-btn")
+                  .forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                state.c2Choice = btn.dataset.choice;
+                checkC2Ready();
+              };
+            });
+
+          const words = item.caption
+            .replace(/[^\w\s]/g, "")
+            .split(" ")
+            .filter((w) => w.length > 3);
+          const uniqueWords = [...new Set(words)];
+          const chipWrap = document.getElementById("c2-wordchips");
+          chipWrap.innerHTML = "";
+          uniqueWords.slice(0, 10).forEach((w) => {
+            const chip = document.createElement("div");
+            chip.className = "word-chip sans";
+            chip.textContent = w;
+            chip.onclick = function () {
+              chip.classList.toggle("picked");
+              if (chip.classList.contains("picked")) {
+                state.c2Words.push(w);
+              } else {
+                state.c2Words = state.c2Words.filter((x) => x !== w);
+              }
+            };
+            chipWrap.appendChild(chip);
+          });
+        }
+
+        function checkC2Ready() {
+          document.getElementById("c2-reveal-btn").disabled = !state.c2Choice;
+        }
+
+        window.revealC2 = function () {
+          const item = state.c2;
+          document.getElementById("c2-audience").textContent = item.audience;
+          document.getElementById("c2-intended").textContent = item.intended;
+          document.getElementById("c2-technique").textContent = item.technique;
+          document.getElementById("c2-highlighted").innerHTML =
+            item.emotionalWords
+              .map((w) => `<span class="highlight bad">${w}</span>`)
+              .join("  ·  ");
+          document.getElementById("c2-neutral").textContent = item.neutral;
+          document.getElementById("c2-takeaway").textContent = item.takeaway;
+
+          document.getElementById("c2-reveal").classList.remove("hidden");
+          document.getElementById("c2-next-row").classList.remove("hidden");
+          document.getElementById("c2-reveal-btn").disabled = true;
+
+          state.metrics.emotion = 60 + Math.floor(Math.random() * 30);
+          state.metrics.audience = 55 + Math.floor(Math.random() * 35);
+          updateMetric(
+            "emotion",
+            state.metrics.emotion,
+            document.getElementById("mEmotionBar"),
+          );
+          updateMetric(
+            "audience",
+            state.metrics.audience,
+            document.getElementById("mAudienceBar"),
+          );
+
+          document
+            .getElementById("c2-reveal")
+            .scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
+
+        /* ---------------- METRICS ---------------- */
+        function updateMetric(key, value, barEl) {
+          const labelEl = document.getElementById(
+            "m" + key.charAt(0).toUpperCase() + key.slice(1),
+          );
+          labelEl.textContent = value + "%";
+          barEl.style.width = value + "%";
+        }
+
+        /* ---------------- DASHBOARD ---------------- */
+        function buildDashboard() {
+          const m = state.metrics;
+          const headline = m.headline ?? 50;
+          const source = m.source ?? 50;
+          const emotion = m.emotion ?? 50;
+          const audience = m.audience ?? 50;
+
+          // Overall integrity = high headline/source accuracy is good, high manipulation/targeting is bad-ish (inverted)
+          const overall = Math.round(
+            (headline + source + (100 - emotion) + (100 - audience)) / 4,
+          );
+
+          document.getElementById("overallScore").textContent = overall;
+          const circumference = 2 * Math.PI * 78;
+          const offset = circumference - (overall / 100) * circumference;
+          const ring = document.getElementById("ringFill");
+          ring.setAttribute("stroke-dasharray", circumference);
+          setTimeout(() => {
+            ring.style.strokeDashoffset = offset;
+          }, 150);
+
+          let verdict = "";
+          if (overall >= 75)
+            verdict =
+              "You showed strong instincts for spotting exaggeration and emotional pressure — keep applying that same skepticism daily.";
+          else if (overall >= 50)
+            verdict =
+              "You caught some red flags, but a few manipulative techniques still slipped past your first read. That's completely normal — awareness is the first step.";
+          else
+            verdict =
+              "This content was designed to bypass careful reading, and it mostly worked on the first pass. The good news: now that you've seen the techniques, they'll be easier to spot next time.";
+          document.getElementById("overallVerdict").textContent = verdict;
+
+          const learned = `You practiced spotting the gap between a headline (accuracy score: ${headline}/100) and its actual article, and you identified emotional language used to trigger a fast reaction rather than careful thought.`;
+          document.getElementById("learnedSummary").textContent = learned;
+
+          const biggestFlag =
+            emotion > headline
+              ? `Emotional manipulation was the strongest signal in what you reviewed — language built to provoke ${state.c2 ? state.c2.intended.split(" — ")[0].toLowerCase() : "a strong reaction"} rather than inform.`
+              : `The headline-to-article mismatch was the strongest signal — a headline that promised more drama than the actual story delivered.`;
+          document.getElementById("biggestRedFlag").textContent = biggestFlag;
+        }
+
+        window.restartApp = function () {
+          state = {
+            c1: null,
+            c2: null,
+            c1Choice: null,
+            c1Words: [],
+            c2Choice: null,
+            c2Words: [],
+            metrics: {
+              headline: null,
+              source: null,
+              emotion: null,
+              audience: null,
+            },
+          };
+          ["mHeadline", "mSource", "mEmotion", "mAudience"].forEach((id) => {
+            document.getElementById(id).textContent = "—";
+          });
+          ["mHeadlineBar", "mSourceBar", "mEmotionBar", "mAudienceBar"].forEach(
+            (id) => {
+              document.getElementById(id).style.width = "0%";
+            },
+          );
+          document.getElementById("ringFill").style.strokeDashoffset = 490;
+          hideAll();
+          setProgress(0);
+          document.getElementById("screen-intro").classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        // init
+        setProgress(0);
+      })();
+    </script>
+  </body>
+</html>
