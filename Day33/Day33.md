@@ -88,7 +88,7 @@ At the end of the experience, the application generates a personalized report co
 
 This reinforces learning and encourages continuous improvement.
 
-
+o
 # 🧠 Key Learnings
 
 ### 1. Headlines Shape Perception
