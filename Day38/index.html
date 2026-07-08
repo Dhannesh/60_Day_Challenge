@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Speed Studio</title>
+<style>
+:root{
+  --bg-0:#0d1117;
+  --bg-1:#11161d;
+  --bg-2:#161c25;
+  --bg-3:#1c2330;
+  --line:#252d3a;
+  --line-soft:#1c2330;
+  --text-0:#e8ebf0;
+  --text-1:#9aa5b8;
+  --text-2:#5f6b80;
+  --amber:#e0a94e;
+  --amber-soft:#e0a94e33;
+  --amber-dim:#8a6a2f;
+  --green:#5fd88f;
+  --red:#e2647a;
+  --blue:#5fa8e0;
+  --mono: 'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans: 'Inter','Segoe UI',system-ui,sans-serif;
+  --radius: 10px;
+  --transition: 180ms cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --bg-0:#f5f4f0;
+  --bg-1:#ffffff;
+  --bg-2:#f0efe9;
+  --bg-3:#e8e6dd;
+  --line:#d8d5c9;
+  --line-soft:#e5e2d6;
+  --text-0:#20242c;
+  --text-1:#5a5f6a;
+  --text-2:#8a8f99;
+  --amber:#b8781f;
+  --amber-soft:#b8781f22;
+  --amber-dim:#c99a4f;
+}
+[data-theme="midnight"]{
+  --bg-0:#05070a;
+  --bg-1:#080b10;
+  --bg-2:#0d1117;
+  --bg-3:#12161d;
+  --line:#1a2029;
+  --amber:#e0a94e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg-0);
+  color:var(--text-0);
+  font-family:var(--sans);
+  overflow-x:hidden;
+  transition:background var(--transition), color var(--transition);
+  -webkit-font-smoothing:antialiased;
+}
+body.font-md{font-size:15px;}
+body.font-lg{font-size:17px;}
+body.font-sm{font-size:13px;}
+::selection{background:var(--amber-soft);color:var(--text-0);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:var(--bg-0);}
+::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:8px;}
+::-webkit-scrollbar-thumb:hover{background:var(--line);}
+
+.app{max-width:1180px;margin:0 auto;padding:28px 24px 80px;}
+
+/* ---------- HEADER ---------- */
+header.top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:28px;flex-wrap:wrap;gap:14px;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{
+  width:38px;height:38px;border-radius:9px;
+  background:linear-gradient(135deg,var(--amber),var(--amber-dim));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;color:#0d1117;font-size:16px;
+  box-shadow:0 4px 18px -6px var(--amber-soft);
+  flex-shrink:0;
+}
+.brand-text h1{font-size:16.5px;font-weight:700;letter-spacing:.2px;}
+.brand-text .sub{font-family:var(--mono);font-size:11px;color:var(--text-2);letter-spacing:.5px;}
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.icon-btn{
+  width:36px;height:36px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg-1);color:var(--text-1);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all var(--transition);font-size:15px;
+}
+.icon-btn:hover{border-color:var(--amber-dim);color:var(--amber);transform:translateY(-1px);}
+.icon-btn.active{border-color:var(--amber);color:var(--amber);background:var(--amber-soft);}
+
+/* ---------- TABS: MODES ---------- */
+.mode-bar{
+  display:flex;gap:6px;flex-wrap:wrap;background:var(--bg-1);
+  border:1px solid var(--line);border-radius:12px;padding:6px;margin-bottom:14px;
+}
+.mode-btn{
+  font-family:var(--mono);font-size:12px;padding:8px 13px;border-radius:8px;
+  border:none;background:transparent;color:var(--text-1);cursor:pointer;
+  transition:all var(--transition);white-space:nowrap;letter-spacing:.2px;
+}
+.mode-btn:hover{color:var(--text-0);background:var(--bg-2);}
+.mode-btn.active{background:var(--amber);color:#14100a;font-weight:700;}
+
+/* ---------- OPTIONS ROW ---------- */
+.options-row{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:22px;
+  min-height:38px;
+}
+.opt-group{display:flex;gap:6px;background:var(--bg-1);border:1px solid var(--line);border-radius:10px;padding:4px;}
+.opt-chip{
+  font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:7px;border:none;
+  background:transparent;color:var(--text-1);cursor:pointer;transition:all var(--transition);
+}
+.opt-chip:hover{color:var(--text-0);}
+.opt-chip.active{background:var(--bg-3);color:var(--amber);font-weight:700;}
+.opt-select{
+  font-family:var(--mono);font-size:12px;background:var(--bg-1);color:var(--text-0);
+  border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;
+}
+.opt-select:focus, .opt-chip:focus-visible, .mode-btn:focus-visible, .icon-btn:focus-visible{
+  outline:2px solid var(--amber);outline-offset:1px;
+}
+
+/* ---------- STATS BAR ---------- */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin-bottom:26px;
+}
+.stat-cell{
+  background:var(--bg-1);padding:14px 10px;text-align:center;
+  transition:background var(--transition);
+}
+.stat-cell .val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);line-height:1.1;}
+.stat-cell .lbl{font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+@media (max-width:820px){.stats-bar{grid-template-columns:repeat(3,1fr);}}
+
+/* progress bar */
+.progress-track{
+  height:4px;background:var(--bg-2);border-radius:2px;overflow:hidden;margin-bottom:18px;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--amber-dim),var(--amber));
+  width:0%;transition:width 120ms linear;border-radius:2px;
+}
+
+/* ---------- TYPING AREA ---------- */
+.type-stage{
+  position:relative;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:16px;padding:38px 34px;margin-bottom:20px;min-height:180px;
+  transition:border-color var(--transition), filter var(--transition);
+}
+.type-stage.focused{border-color:var(--amber-dim);}
+.type-stage.paused .text-display{filter:blur(6px);opacity:.5;}
+.overlay-msg{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;background:rgba(13,17,23,.55);border-radius:16px;
+  font-family:var(--mono);color:var(--text-0);z-index:5;backdrop-filter:blur(3px);
+}
+[data-theme="light"] .overlay-msg{background:rgba(245,244,240,.65);}
+.overlay-msg .big{font-size:19px;font-weight:700;}
+.overlay-msg .small{font-size:12px;color:var(--text-2);}
+.overlay-msg button{margin-top:6px;}
+
+.text-display{
+  font-family:var(--mono);line-height:1.95;letter-spacing:.2px;
+  white-space:pre-wrap;word-break:break-word;user-select:none;
+  font-size:20px;
+}
+body.font-sm .text-display{font-size:17px;}
+body.font-lg .text-display{font-size:23px;}
+.text-display span{position:relative;transition:color 80ms;}
+.ch-pending{color:var(--text-2);}
+.ch-correct{color:var(--text-0);}
+.ch-incorrect{color:var(--red);background:#e2647a1a;border-radius:3px;}
+.ch-extra{color:var(--red);text-decoration:underline;opacity:.7;}
+.ch-current{
+  border-left:2px solid var(--amber);
+  animation:caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink{0%,49%{border-color:var(--amber);}50%,100%{border-color:transparent;}}
+.line-dim{opacity:.15;}
+.focus-mode .line-dim{display:none;}
+
+.hidden-input{
+  position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;
+}
+
+/* click to focus hint */
+.click-hint{
+  text-align:center;font-family:var(--mono);font-size:11px;color:var(--text-2);
+  margin-bottom:22px;letter-spacing:.3px;
+}
+.click-hint kbd{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;
+  font-family:var(--mono);color:var(--text-1);
+}
+
+/* action row */
+.action-row{display:flex;gap:10px;justify-content:center;margin-bottom:8px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg-1);color:var(--text-1);cursor:pointer;
+  transition:all var(--transition);display:flex;align-items:center;gap:7px;
+}
+.btn:hover{border-color:var(--amber-dim);color:var(--text-0);transform:translateY(-1px);}
+.btn.primary{background:var(--amber);color:#14100a;font-weight:700;border-color:var(--amber);}
+.btn.primary:hover{filter:brightness(1.08);}
+
+/* ---------- CUSTOM TEXT PANEL ---------- */
+.custom-panel{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;
+}
+.custom-panel textarea{
+  width:100%;min-height:90px;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:8px;color:var(--text-0);font-family:var(--mono);font-size:13px;padding:10px;resize:vertical;
+}
+.custom-panel .row{display:flex;justify-content:flex-end;margin-top:10px;gap:8px;}
+
+/* ---------- HISTORY / SIDE PANELS ---------- */
+.section-title{
+  font-family:var(--mono);font-size:12px;color:var(--text-2);text-transform:uppercase;
+  letter-spacing:1.2px;margin:34px 0 14px;display:flex;align-items:center;gap:10px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--line);}
+
+.history-list{display:flex;flex-direction:column;gap:8px;}
+.history-row{
+  display:grid;grid-template-columns:90px 1fr 70px 70px 90px;gap:10px;align-items:center;
+  background:var(--bg-1);border:1px solid var(--line);border-radius:9px;padding:10px 14px;
+  font-family:var(--mono);font-size:12px;
+}
+.history-row .tag{color:var(--amber);font-weight:700;}
+.history-row .meta{color:var(--text-2);}
+.history-row .wpm{color:var(--text-0);font-weight:700;font-size:14px;}
+.history-row .acc{color:var(--green);}
+@media (max-width:700px){.history-row{grid-template-columns:1fr 1fr;font-size:11px;}}
+
+/* ---------- RESULTS DASHBOARD ---------- */
+.results-overlay{
+  position:fixed;inset:0;background:rgba(5,7,10,.72);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-start;justify-content:center;z-index:100;
+  padding:40px 20px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 220ms ease;
+}
+.results-overlay.show{opacity:1;pointer-events:auto;}
+.results-card{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:20px;
+  max-width:920px;width:100%;padding:36px;
+  transform:translateY(14px);opacity:0;transition:all 320ms cubic-bezier(.2,.8,.2,1);
+}
+.results-overlay.show .results-card{transform:translateY(0);opacity:1;}
+.results-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;}
+.results-head h2{font-size:22px;}
+.results-head .close-x{cursor:pointer;color:var(--text-2);font-size:20px;background:none;border:none;}
+.results-head .close-x:hover{color:var(--text-0);}
+
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px;}
+.hero-stat{
+  background:var(--bg-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px;text-align:center;
+}
+.hero-stat .num{font-family:var(--mono);font-size:32px;font-weight:800;color:var(--amber);}
+.hero-stat .lbl{font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:.7px;margin-top:5px;}
+@media (max-width:700px){.hero-stats{grid-template-columns:repeat(2,1fr);}}
+
+.chart-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px;}
+@media (max-width:800px){.chart-grid{grid-template-columns:1fr;}}
+.chart-box{background:var(--bg-2);border:1px solid var(--line-soft);border-radius:14px;padding:16px;}
+.chart-box h4{font-size:12px;color:var(--text-2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
+.chart-box svg{width:100%;display:block;}
+
+.detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.detail-cell{background:var(--bg-2);border:1px solid var(--line-soft);border-radius:10px;padding:12px;text-align:center;}
+.detail-cell .v{font-family:var(--mono);font-weight:700;font-size:17px;}
+.detail-cell .l{font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+@media (max-width:700px){.detail-grid{grid-template-columns:repeat(2,1fr);}}
+
+.badges-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+.badge{
+  display:flex;align-items:center;gap:7px;background:var(--amber-soft);border:1px solid var(--amber-dim);
+  color:var(--amber);border-radius:20px;padding:7px 14px;font-size:12px;font-family:var(--mono);font-weight:700;
+  animation:badgePop 380ms cubic-bezier(.2,.9,.3,1.4);
+}
+@keyframes badgePop{0%{transform:scale(.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+.summary-box{background:var(--bg-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px 20px;margin-bottom:20px;}
+.summary-box h4{font-size:12px;color:var(--text-2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
+.summary-box p{font-size:13.5px;line-height:1.7;color:var(--text-1);}
+.summary-box b{color:var(--text-0);}
+.keys-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.key-chip{
+  font-family:var(--mono);background:var(--bg-3);border:1px solid var(--line);
+  border-radius:6px;padding:4px 9px;font-size:12px;color:var(--red);
+}
+
+.results-actions{display:flex;gap:10px;justify-content:center;margin-top:6px;}
+
+/* toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--bg-3);border:1px solid var(--line);color:var(--text-0);
+  padding:11px 20px;border-radius:10px;font-family:var(--mono);font-size:12.5px;
+  opacity:0;transition:all 260ms ease;z-index:200;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* keyboard shortcuts panel */
+.shortcuts-panel{
+  position:fixed;top:0;right:0;height:100%;width:300px;background:var(--bg-1);
+  border-left:1px solid var(--line);transform:translateX(100%);transition:transform 260ms ease;
+  z-index:150;padding:24px;overflow-y:auto;
+}
+.shortcuts-panel.show{transform:translateX(0);}
+.shortcuts-panel h3{font-size:15px;margin-bottom:18px;}
+.shortcut-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;}
+.shortcut-item kbd{background:var(--bg-3);border:1px solid var(--line);border-radius:5px;padding:3px 8px;font-family:var(--mono);}
+
+.footer-note{text-align:center;color:var(--text-2);font-size:11px;font-family:var(--mono);margin-top:40px;letter-spacing:.3px;}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;}
+}
+</style>
+</head>
+<body class="font-md" data-theme="dark">
+<div class="app">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">&gt;_</div>
+      <div class="brand-text">
+        <h1>Typing Speed Studio</h1>
+        <div class="sub">// precision practice for developers</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnSound" title="Toggle sound">🔊</button>
+      <button class="icon-btn" id="btnTheme" title="Cycle theme">◐</button>
+      <button class="icon-btn" id="btnFontMinus" title="Smaller text">A-</button>
+      <button class="icon-btn" id="btnFontPlus" title="Larger text">A+</button>
+      <button class="icon-btn" id="btnShortcuts" title="Keyboard shortcuts">⌘</button>
+    </div>
+  </header>
+
+  <nav class="mode-bar" id="modeBar" role="tablist" aria-label="Typing modes"></nav>
+
+  <div class="options-row" id="optionsRow"></div>
+
+  <div class="custom-panel" id="customPanel" style="display:none;">
+    <textarea id="customText" placeholder="Paste or write the exact text you want to practice..."></textarea>
+    <div class="row">
+      <button class="btn primary" id="applyCustom">Use this text</button>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-cell"><div class="val" id="statWpm">0</div><div class="lbl">WPM</div></div>
+    <div class="stat-cell"><div class="val" id="statRaw">0</div><div class="lbl">Raw WPM</div></div>
+    <div class="stat-cell"><div class="val" id="statAcc">100%</div><div class="lbl">Accuracy</div></div>
+    <div class="stat-cell"><div class="val" id="statTime">0s</div><div class="lbl">Elapsed</div></div>
+    <div class="stat-cell"><div class="val" id="statMistakes">0</div><div class="lbl">Mistakes</div></div>
+    <div class="stat-cell"><div class="val" id="statStreak">0</div><div class="lbl">Streak</div></div>
+  </div>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="type-stage" id="typeStage">
+    <div class="overlay-msg" id="overlayMsg" style="display:none;">
+      <div class="big" id="overlayBig">Paused</div>
+      <div class="small" id="overlaySmall">Press Enter or click Resume to continue</div>
+      <button class="btn primary" id="overlayBtn">Resume</button>
+    </div>
+    <div class="text-display" id="textDisplay" tabindex="0"></div>
+  </div>
+  <input class="hidden-input" id="hiddenInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+
+  <div class="click-hint">Click the text area or press <kbd>Tab</kbd> then <kbd>Enter</kbd> to start &nbsp;•&nbsp; <kbd>Esc</kbd> pause &nbsp;•&nbsp; <kbd>Ctrl+R</kbd> restart</div>
+
+  <div class="action-row">
+    <button class="btn" id="btnRestart">↺ Restart</button>
+    <button class="btn" id="btnPause">⏸ Pause</button>
+    <button class="btn" id="btnNew">⟳ New Text</button>
+  </div>
+
+  <div class="section-title">Session History</div>
+  <div class="history-list" id="historyList"></div>
+
+  <div class="footer-note">Typing Speed Studio — all data stored locally in your browser. No account required.</div>
+</div>
+
+<div class="shortcuts-panel" id="shortcutsPanel">
+  <h3>Keyboard Shortcuts</h3>
+  <div class="shortcut-item"><span>Pause / Resume</span><kbd>Esc</kbd></div>
+  <div class="shortcut-item"><span>Restart same text</span><kbd>Ctrl+R</kbd></div>
+  <div class="shortcut-item"><span>New random text</span><kbd>Tab</kbd></div>
+  <div class="shortcut-item"><span>Close this panel</span><kbd>Esc</kbd></div>
+  <div class="shortcut-item"><span>Cycle theme</span><kbd>Ctrl+T</kbd></div>
+  <div class="shortcut-item"><span>Close results</span><kbd>Esc</kbd></div>
+</div>
+
+<div class="results-overlay" id="resultsOverlay">
+  <div class="results-card">
+    <div class="results-head">
+      <div>
+        <h2 id="resTitle">Session Complete</h2>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text-2);margin-top:4px;" id="resSubtitle">—</div>
+      </div>
+      <button class="close-x" id="closeResults">✕</button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="hWpm">0</div><div class="lbl">WPM</div></div>
+      <div class="hero-stat"><div class="num" id="hAcc">0%</div><div class="lbl">Accuracy</div></div>
+      <div class="hero-stat"><div class="num" id="hCons">0%</div><div class="lbl">Consistency</div></div>
+      <div class="hero-stat"><div class="num" id="hPct">0%</div><div class="lbl">Percentile</div></div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h4>WPM &amp; Accuracy Over Time</h4>
+        <svg id="wpmChart" viewBox="0 0 600 200"></svg>
+      </div>
+      <div class="chart-box">
+        <h4>Error Heatmap (by key)</h4>
+        <svg id="heatChart" viewBox="0 0 300 200"></svg>
+      </div>
+    </div>
+
+    <div class="detail-grid" id="detailGrid"></div>
+
+    <div class="badges-row" id="badgesRow"></div>
+
+    <div class="summary-box">
+      <h4>Performance Summary</h4>
+      <p id="summaryText">—</p>
+      <div class="keys-row" id="mistypedKeys"></div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn primary" id="resRetry">Retry Same Text</button>
+      <button class="btn" id="resNew">Next Text</button>
+      <button class="btn" id="resClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   CONTENT LIBRARY
+   ============================================================ */
+
+const CODE_SNIPPETS = {
+  javascript: [
+`function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}`,
+`class EventEmitter {
+  constructor() {
+    this.listeners = {};
+  }
+  on(event, callback) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(callback);
+    return this;
+  }
+  emit(event, payload) {
+    (this.listeners[event] || []).forEach(cb => cb(payload));
+  }
+}`,
+`const memoize = (fn) => {
+  const cache = new Map();
+  return (...args) => {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  };
+};`,
+`async function fetchWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Bad response");
+      return await res.json();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(r => setTimeout(r, 300 * (i + 1)));
+    }
+  }
+}`
+  ],
+  python: [
+`def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    mid = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + mid + quicksort(right)`,
+`class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.cache = {}
+        self.order = []
+
+    def get(self, key):
+        if key not in self.cache:
+            return -1
+        self.order.remove(key)
+        self.order.append(key)
+        return self.cache[key]`,
+`import functools
+
+def retry(times=3, delay=1):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(times):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == times - 1:
+                        raise e
+        return wrapper
+    return decorator`,
+`def binary_search(arr, target):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1`
+  ],
+  java: [
+`public class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+
+    public static synchronized Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}`,
+`public int fibonacci(int n) {
+    if (n <= 1) return n;
+    int[] memo = new int[n + 1];
+    memo[0] = 0;
+    memo[1] = 1;
+    for (int i = 2; i <= n; i++) {
+        memo[i] = memo[i - 1] + memo[i - 2];
+    }
+    return memo[n];
+}`,
+`public class Stack<T> {
+    private List<T> items = new ArrayList<>();
+
+    public void push(T item) {
+        items.add(item);
+    }
+
+    public T pop() {
+        if (items.isEmpty()) throw new RuntimeException("Empty stack");
+        return items.remove(items.size() - 1);
+    }
+}`
+  ],
+  cpp: [
+`int binarySearch(vector<int>& arr, int target) {
+    int low = 0, high = arr.size() - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}`,
+`class Node {
+public:
+    int data;
+    Node* next;
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+void insertAtHead(Node*& head, int val) {
+    Node* newNode = new Node(val);
+    newNode->next = head;
+    head = newNode;
+}`,
+`template <typename T>
+class SmartPointer {
+    T* ptr;
+public:
+    explicit SmartPointer(T* p = nullptr) : ptr(p) {}
+    ~SmartPointer() { delete ptr; }
+    T& operator*() { return *ptr; }
+};`
+  ],
+  sql: [
+`SELECT customers.name, COUNT(orders.id) AS total_orders
+FROM customers
+LEFT JOIN orders ON customers.id = orders.customer_id
+GROUP BY customers.name
+HAVING COUNT(orders.id) > 5
+ORDER BY total_orders DESC;`,
+`CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    department_id INTEGER REFERENCES departments(id),
+    salary NUMERIC(10, 2),
+    hired_at DATE DEFAULT CURRENT_DATE
+);`,
+`WITH ranked_sales AS (
+  SELECT product_id, revenue,
+         RANK() OVER (PARTITION BY category ORDER BY revenue DESC) AS rnk
+  FROM sales
+)
+SELECT * FROM ranked_sales WHERE rnk <= 3;`
+  ],
+  html: [
+`<section class="card">
+  <header>
+    <h2 class="card-title">Dashboard</h2>
+    <button class="btn-icon" aria-label="Settings">⚙</button>
+  </header>
+  <div class="card-body">
+    <p>Welcome back, here is your summary.</p>
+  </div>
+</section>`,
+`<form id="signup" novalidate>
+  <label for="email">Email address</label>
+  <input type="email" id="email" required>
+  <label for="pwd">Password</label>
+  <input type="password" id="pwd" minlength="8" required>
+  <button type="submit">Create account</button>
+</form>`
+  ],
+  css: [
+`.card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}`,
+`@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+  }
+  .nav-links.open {
+    display: flex;
+  }
+}`
+  ]
+};
+
+const QUOTES = [
+"Programs must be written for people to read, and only incidentally for machines to execute.",
+"The best error message is the one that never shows up because you designed for it in the first place.",
+"Simplicity is prerequisite for reliability, and complexity is the enemy of correctness.",
+"First, solve the problem. Then, write the code. Order matters more than speed.",
+"Debugging is twice as hard as writing the code in the first place, so write code that is easy to debug.",
+"Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+"Premature optimization is the root of a great deal of wasted engineering time.",
+"Code is read far more often than it is written, so clarity should always win over cleverness."
+];
+
+const GENERAL = [
+"The quick brown fox jumps over the lazy dog while the sun sets behind the distant hills.",
+"Consistent practice builds muscle memory faster than occasional bursts of intense effort.",
+"A calm morning routine often leads to a more focused and productive afternoon.",
+"Great cities are built one careful decision at a time, brick by brick, plan by plan.",
+"Curiosity is the quiet engine that drives every meaningful discovery forward."
+];
+
+const CATEGORY_LABELS = {
+  javascript:"JavaScript", python:"Python", java:"Java", cpp:"C++", sql:"SQL", html:"HTML", css:"CSS"
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+const state = {
+  mode: "time",
+  timeOption: 30,
+  wordOption: 50,
+  progLang: "javascript",
+  soundOn: true,
+  theme: "dark",
+  fontSize: "md",
+  focusMode: false,
+  zenMode: false,
+
+  running: false,
+  paused: false,
+  finished: false,
+  startTime: null,
+  elapsedMs: 0,
+  timerHandle: null,
+
+  targetText: "",
+  typed: "",          // what user typed so far (array of chars incl extra)
+  charStates: [],     // 'pending'|'correct'|'incorrect'
+  extraChars: [],     // indices where user typed beyond target line
+
+  mistakes: 0,
+  totalKeystrokes: 0,
+  correctKeystrokes: 0,
+  currentStreak: 0,
+  bestStreakSession: 0,
+
+  wpmSamples: [],     // {t, wpm, raw, acc}
+  mistypedKeyCounts: {},
+
+  history: JSON.parse(localStorage.getItem("tss_history") || "[]"),
+  bests: JSON.parse(localStorage.getItem("tss_bests") || "{}")
+};
+
+/* ============================================================
+   DOM REFS
+   ============================================================ */
+
+const $ = (id) => document.getElementById(id);
+const modeBar = $("modeBar");
+const optionsRow = $("optionsRow");
+const customPanel = $("customPanel");
+const customText = $("customText");
+const textDisplay = $("textDisplay");
+const hiddenInput = $("hiddenInput");
+const typeStage = $("typeStage");
+const overlayMsg = $("overlayMsg");
+const overlayBig = $("overlayBig");
+const overlaySmall = $("overlaySmall");
+const overlayBtn = $("overlayBtn");
+const progressFill = $("progressFill");
+const historyList = $("historyList");
+const toastEl = $("toast");
+const shortcutsPanel = $("shortcutsPanel");
+const resultsOverlay = $("resultsOverlay");
+
+const MODES = [
+  {id:"time", label:"Time"},
+  {id:"words", label:"Words"},
+  {id:"quote", label:"Quote"},
+  {id:"programming", label:"Programming"},
+  {id:"custom", label:"Custom"},
+  {id:"adaptive", label:"Adaptive"},
+  {id:"focus", label:"Focus"},
+  {id:"zen", label:"Zen"}
+];
+
+/* ============================================================
+   AUDIO (tiny synthesized clicks, no external files)
+   ============================================================ */
+let actx = null;
+function beep(freq, dur, vol){
+  if(!state.soundOn) return;
+  try{
+    if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = "sine"; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(actx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
+    o.stop(actx.currentTime + dur);
+  }catch(e){}
+}
+const soundKey = () => beep(520, 0.04, 0.02);
+const soundError = () => beep(160, 0.08, 0.03);
+const soundDone = () => { beep(660,0.12,0.04); setTimeout(()=>beep(880,0.16,0.04),120); };
+
+/* ============================================================
+   RENDER: MODE BAR + OPTIONS
+   ============================================================ */
+
+function renderModeBar(){
+  modeBar.innerHTML = "";
+  MODES.forEach(m=>{
+    const btn = document.createElement("button");
+    btn.className = "mode-btn" + (state.mode===m.id ? " active" : "");
+    btn.textContent = m.label;
+    btn.setAttribute("role","tab");
+    btn.addEventListener("click", ()=> switchMode(m.id));
+    modeBar.appendChild(btn);
+  });
+}
+
+function switchMode(modeId){
+  state.mode = modeId;
+  state.focusMode = modeId === "focus";
+  state.zenMode = modeId === "zen";
+  renderModeBar();
+  renderOptions();
+  customPanel.style.display = modeId === "custom" ? "block" : "none";
+  loadNewText();
+}
+
+function renderOptions(){
+  optionsRow.innerHTML = "";
+  if(state.mode === "time"){
+    optionsRow.appendChild(makeChipGroup([15,30,60,120], state.timeOption, (v)=>{state.timeOption=v; loadNewText();}, "s"));
+  } else if(state.mode === "words"){
+    optionsRow.appendChild(makeChipGroup([25,50,100,250], state.wordOption, (v)=>{state.wordOption=v; loadNewText();}, "w"));
+  } else if(state.mode === "programming" || state.mode === "adaptive"){
+    const sel = document.createElement("select");
+    sel.className = "opt-select";
+    Object.keys(CODE_SNIPPETS).forEach(k=>{
+      const opt = document.createElement("option");
+      opt.value = k; opt.textContent = CATEGORY_LABELS[k];
+      if(k===state.progLang) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener("change", e=>{ state.progLang = e.target.value; loadNewText(); });
+    optionsRow.appendChild(sel);
+    if(state.mode === "adaptive"){
+      const badge = document.createElement("div");
+      badge.style.cssText = "font-family:var(--mono);font-size:11px;color:var(--text-2);padding:8px 4px;";
+      badge.id = "adaptiveInfo";
+      badge.textContent = "Difficulty adjusts automatically based on your performance";
+      optionsRow.appendChild(badge);
+    }
+  }
+}
+
+function makeChipGroup(values, active, onSelect, suffix){
+  const group = document.createElement("div");
+  group.className = "opt-group";
+  values.forEach(v=>{
+    const chip = document.createElement("button");
+    chip.className = "opt-chip" + (v===active ? " active" : "");
+    chip.textContent = v + suffix;
+    chip.addEventListener("click", ()=>{
+      [...group.children].forEach(c=>c.classList.remove("active"));
+      chip.classList.add("active");
+      onSelect(v);
+    });
+    group.appendChild(chip);
+  });
+  return group;
+}
+
+/* ============================================================
+   TEXT GENERATION
+   ============================================================ */
+
+let adaptiveLevel = 1; // 1-5
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function generateText(){
+  if(state.mode === "custom"){
+    return state.targetText || "Click \"Use this text\" above after entering your own text.";
+  }
+  if(state.mode === "quote"){
+    return pick(QUOTES);
+  }
+  if(state.mode === "programming"){
+    return pick(CODE_SNIPPETS[state.progLang]);
+  }
+  if(state.mode === "adaptive"){
+    // difficulty scales: low levels -> general english, higher -> code snippets w/ longer length
+    if(adaptiveLevel <= 2) return pick(GENERAL);
+    return pick(CODE_SNIPPETS[state.progLang]);
+  }
+  if(state.mode === "words"){
+    const pool = GENERAL.join(" ").split(" ").filter(Boolean);
+    const words = [];
+    while(words.length < state.wordOption){
+      words.push(pool[Math.floor(Math.random()*pool.length)]);
+    }
+    return words.join(" ");
+  }
+  if(state.mode === "focus" || state.mode === "zen"){
+    return pick(GENERAL) + " " + pick(GENERAL);
+  }
+  // time mode default -> flowing general text, long enough for any duration
+  let text = "";
+  while(text.length < 900){
+    text += pick(GENERAL) + " ";
+  }
+  return text.trim();
+}
+
+/* ============================================================
+   SESSION LIFECYCLE
+   ============================================================ */
+
+function loadNewText(){
+  resetSessionState();
+  state.targetText = generateText();
+  renderText();
+  updateStatsDisplay();
+}
+
+function resetSessionState(){
+  clearInterval(state.timerHandle);
+  state.running = false;
+  state.paused = false;
+  state.finished = false;
+  state.startTime = null;
+  state.elapsedMs = 0;
+  state.typed = "";
+  state.charStates = [];
+  state.mistakes = 0;
+  state.totalKeystrokes = 0;
+  state.correctKeystrokes = 0;
+  state.currentStreak = 0;
+  state.bestStreakSession = 0;
+  state.wpmSamples = [];
+  state.mistypedKeyCounts = {};
+  overlayMsg.style.display = "none";
+  typeStage.classList.remove("paused");
+  progressFill.style.width = "0%";
+}
+
+function startSession(){
+  if(state.running || state.finished) return;
+  state.running = true;
+  state.startTime = Date.now();
+  state.timerHandle = setInterval(tick, 200);
+}
+
+function tick(){
+  if(state.paused) return;
+  state.elapsedMs = Date.now() - state.startTime;
+  updateStatsDisplay();
+  sampleWpm();
+
+  if(state.mode === "time"){
+    const remain = state.timeOption*1000 - state.elapsedMs;
+    if(remain <= 0){ finishSession(); return; }
+  }
+  updateProgress();
+}
+
+function sampleWpm(){
+  const {wpm, raw, acc} = computeLiveStats();
+  state.wpmSamples.push({t: Math.round(state.elapsedMs/1000), wpm, raw, acc});
+}
+
+function pauseSession(){
+  if(!state.running || state.finished) return;
+  state.paused = true;
+  typeStage.classList.add("paused");
+  overlayMsg.style.display = "flex";
+  overlayBig.textContent = "Paused";
+  overlaySmall.textContent = "Press Esc or click Resume to continue";
+  overlayBtn.textContent = "Resume";
+}
+
+function resumeSession(){
+  if(!state.paused) return;
+  // shift startTime forward by paused duration to not count pause time
+  const pausedFor = Date.now() - (state.startTime + state.elapsedMs);
+  state.startTime += pausedFor;
+  state.paused = false;
+  typeStage.classList.remove("paused");
+  overlayMsg.style.display = "none";
+  hiddenInput.focus();
+}
+
+function restartSession(){
+  resetSessionState();
+  renderText();
+  updateStatsDisplay();
+  hiddenInput.focus();
+}
+
+function finishSession(){
+  state.finished = true;
+  state.running = false;
+  clearInterval(state.timerHandle);
+  soundDone();
+  const result = buildResult();
+  saveHistory(result);
+  showResults(result);
+}
+
+/* ============================================================
+   TYPING LOGIC
+   ============================================================ */
+
+function renderText(){
+  textDisplay.innerHTML = "";
+  const target = state.targetText;
+  const typedLen = state.typed.length;
+
+  // Determine focus-mode line boundaries (split by \n, show only current line + prev/next dimmed)
+  const lines = target.split("\n");
+  let charIndex = 0;
+  const frag = document.createDocumentFragment();
+
+  lines.forEach((line, li)=>{
+    const lineSpan = document.createElement("div");
+    let isCurrentLine = false;
+
+    for(let i=0;i<line.length;i++){
+      const globalIdx = charIndex;
+      const ch = line[i];
+      const span = document.createElement("span");
+      span.textContent = ch === " " ? "\u00A0" : ch;
+
+      if(globalIdx < typedLen){
+        const typedCh = state.typed[globalIdx];
+        if(typedCh === ch){ span.className = "ch-correct"; }
+        else { span.className = "ch-incorrect"; }
+      } else if(globalIdx === typedLen){
+        span.className = "ch-pending ch-current";
+        isCurrentLine = true;
+      } else {
+        span.className = "ch-pending";
+      }
+      lineSpan.appendChild(span);
+      charIndex++;
+    }
+    // extra typed chars beyond this line's length are handled globally below via typedLen>target.length edge case
+    if(li < lines.length-1){
+      charIndex++; // account for \n
+      const br = document.createElement("span");
+      br.textContent = "\u21B5\n";
+      br.className = globalIndexClassForNewline(charIndex-1, typedLen);
+      lineSpan.appendChild(br);
+    }
+
+    if(state.focusMode){
+      const activeLine = target.slice(0, typedLen).split("\n").length - 1;
+      if(li !== activeLine) lineSpan.classList.add("line-dim");
+    }
+    frag.appendChild(lineSpan);
+  });
+
+  textDisplay.appendChild(frag);
+}
+
+function globalIndexClassForNewline(idx, typedLen){
+  if(idx < typedLen) return "ch-correct";
+  if(idx === typedLen) return "ch-pending ch-current";
+  return "ch-pending";
+}
+
+function handleKeydown(e){
+  if(state.mode === "custom" && !state.targetText){ return; }
+  if(e.key === "Escape"){
+    if(shortcutsPanel.classList.contains("show")){ shortcutsPanel.classList.remove("show"); return; }
+    if(resultsOverlay.classList.contains("show")){ closeResultsOverlay(); return; }
+    if(state.paused) resumeSession(); else pauseSession();
+    e.preventDefault();
+    return;
+  }
+  if(e.ctrlKey && e.key.toLowerCase()==="r"){ e.preventDefault(); restartSession(); return; }
+  if(e.ctrlKey && e.key.toLowerCase()==="t"){ e.preventDefault(); cycleTheme(); return; }
+  if(e.key === "Tab"){ e.preventDefault(); loadNewText(); return; }
+
+  if(state.paused || state.finished) return;
+
+  if(e.key === "Backspace"){
+    e.preventDefault();
+    if(state.typed.length>0){
+      state.typed = state.typed.slice(0,-1);
+      renderText();
+      updateProgress();
+    }
+    return;
+  }
+
+  if(e.key.length !== 1) return; // ignore ctrl/shift/etc modifier-only presses
+  e.preventDefault();
+
+  if(!state.running) startSession();
+
+  const idx = state.typed.length;
+  const targetChar = state.targetText[idx];
+  state.typed += e.key;
+  state.totalKeystrokes++;
+
+  if(targetChar === undefined){
+    // extra typed beyond text length, ignore effect but still count as mistake
+    state.mistakes++;
+    soundError();
+  } else if(e.key === targetChar){
+    state.correctKeystrokes++;
+    state.currentStreak++;
+    state.bestStreakSession = Math.max(state.bestStreakSession, state.currentStreak);
+    soundKey();
+  } else {
+    state.mistakes++;
+    state.currentStreak = 0;
+    const keyLabel = targetChar === " " ? "space" : targetChar;
+    state.mistypedKeyCounts[keyLabel] = (state.mistypedKeyCounts[keyLabel]||0)+1;
+    soundError();
+  }
+
+  renderText();
+  updateStatsDisplay();
+  updateProgress();
+
+  // completion check for non-time modes
+  const done = state.typed.length >= state.targetText.length;
+  if(done && state.mode !== "time"){
+    finishSession();
+  } else if(done && state.mode === "time"){
+    // in time mode, loop text if finished early
+    state.targetText += " " + generateText();
+  }
+
+  adaptiveCheck();
+}
+
+function adaptiveCheck(){
+  if(state.mode !== "adaptive") return;
+  const {wpm, acc} = computeLiveStats();
+  if(wpm > 55 && acc > 96 && adaptiveLevel < 5) adaptiveLevel++;
+  else if((wpm < 25 || acc < 85) && adaptiveLevel > 1) adaptiveLevel--;
+}
+
+/* ============================================================
+   STATS COMPUTATION
+   ============================================================ */
+
+function computeLiveStats(){
+  const minutes = Math.max(state.elapsedMs/60000, 1/600); // avoid div by 0, floor tiny
+  const correctChars = state.correctKeystrokes;
+  const totalChars = state.totalKeystrokes;
+  const raw = totalChars>0 ? (totalChars/5)/minutes : 0;
+  const wpm = correctChars>0 ? (correctChars/5)/minutes : 0;
+  const acc = totalChars>0 ? (correctChars/totalChars)*100 : 100;
+  return {
+    wpm: clampStat(wpm),
+    raw: clampStat(raw),
+    acc: Math.min(100, Math.max(0, acc))
+  };
+}
+
+function clampStat(v){
+  if(!isFinite(v) || v<0) return 0;
+  return Math.min(v, 300); // sanity ceiling, realistic max
+}
+
+function updateStatsDisplay(){
+  const {wpm, raw, acc} = computeLiveStats();
+  $("statWpm").textContent = Math.round(wpm);
+  $("statRaw").textContent = Math.round(raw);
+  $("statAcc").textContent = acc.toFixed(0)+"%";
+  $("statTime").textContent = Math.floor(state.elapsedMs/1000)+"s";
+  $("statMistakes").textContent = state.mistakes;
+  $("statStreak").textContent = state.currentStreak;
+}
+
+function updateProgress(){
+  let pct = 0;
+  if(state.mode === "time"){
+    pct = Math.min(100, (state.elapsedMs/(state.timeOption*1000))*100);
+  } else {
+    pct = Math.min(100, (state.typed.length/Math.max(state.targetText.length,1))*100);
+  }
+  progressFill.style.width = pct+"%";
+}
+
+/* ============================================================
+   RESULTS / ANALYTICS
+   ============================================================ */
+
+function buildResult(){
+  const {wpm, raw, acc} = computeLiveStats();
+  const consistency = computeConsistency();
+  const correctChars = state.correctKeystrokes;
+  const incorrectChars = state.mistakes;
+  const totalTargetChars = state.targetText.length;
+  const missed = Math.max(0, totalTargetChars - state.typed.length);
+  const extra = Math.max(0, state.typed.length - totalTargetChars);
+  const completion = Math.min(100, (state.typed.length/Math.max(totalTargetChars,1))*100);
+  const durationSec = Math.max(1, Math.round(state.elapsedMs/1000));
+  const percentile = estimatePercentile(wpm, acc);
+
+  const modeLabelMap = {time:"Time", words:"Words", quote:"Quote", programming:"Programming",
+    custom:"Custom", adaptive:"Adaptive", focus:"Focus", zen:"Zen"};
+
+  return {
+    mode: state.mode,
+    modeLabel: modeLabelMap[state.mode]||state.mode,
+    lang: state.mode==="programming"||state.mode==="adaptive" ? state.progLang : null,
+    wpm: Math.round(wpm),
+    raw: Math.round(raw),
+    acc: Math.round(acc),
+    consistency: Math.round(consistency),
+    correctChars, incorrectChars, extra, missed,
+    completion: Math.round(completion),
+    duration: durationSec,
+    percentile,
+    bestStreak: state.bestStreakSession,
+    mistypedKeys: {...state.mistypedKeyCounts},
+    wpmSamples: state.wpmSamples.slice(),
+    timestamp: Date.now()
+  };
+}
+
+function computeConsistency(){
+  const samples = state.wpmSamples.map(s=>s.wpm).filter(v=>v>0);
+  if(samples.length < 2) return 100;
+  const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+  const variance = samples.reduce((a,b)=>a+(b-mean)*(b-mean),0)/samples.length;
+  const sd = Math.sqrt(variance);
+  const cv = mean>0 ? sd/mean : 0;
+  return Math.max(0, 100 - cv*100);
+}
+
+function estimatePercentile(wpm, acc){
+  // rough normal-ish curve calibrated around typical distributions
+  let p = 50;
+  if(wpm >= 100) p = 99;
+  else if(wpm >= 80) p = 95;
+  else if(wpm >= 65) p = 85;
+  else if(wpm >= 50) p = 70;
+  else if(wpm >= 40) p = 55;
+  else if(wpm >= 30) p = 40;
+  else if(wpm >= 20) p = 25;
+  else p = 10;
+  if(acc < 90) p = Math.max(1, p-15);
+  return Math.min(99, Math.max(1,p));
+}
+
+function saveHistory(result){
+  state.history.unshift(result);
+  state.history = state.history.slice(0,50);
+  localStorage.setItem("tss_history", JSON.stringify(state.history));
+
+  const bestKey = result.mode+(result.lang?("_"+result.lang):"");
+  const prevBest = state.bests[bestKey];
+  if(!prevBest || result.wpm > prevBest.wpm){
+    state.bests[bestKey] = {wpm:result.wpm, acc:result.acc, timestamp:result.timestamp};
+    localStorage.setItem("tss_bests", JSON.stringify(state.bests));
+    result.isPB = true;
+  }
+  renderHistory();
+}
+
+function renderHistory(){
+  historyList.innerHTML = "";
+  if(state.history.length===0){
+    historyList.innerHTML = '<div style="color:var(--text-2);font-family:var(--mono);font-size:12px;padding:10px;">No sessions yet — complete a test to see your history here.</div>';
+    return;
+  }
+  state.history.slice(0,12).forEach(h=>{
+    const row = document.createElement("div");
+    row.className = "history-row";
+    const date = new Date(h.timestamp);
+    row.innerHTML = `
+      <div class="tag">${h.modeLabel}</div>
+      <div class="meta">${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}${h.lang?(" · "+CATEGORY_LABELS[h.lang]):""}</div>
+      <div class="wpm">${h.wpm}<span style="font-size:10px;color:var(--text-2);"> wpm</span></div>
+      <div class="acc">${h.acc}%</div>
+      <div class="meta">${h.duration}s</div>
+    `;
+    historyList.appendChild(row);
+  });
+}
+
+/* ---------- results dashboard rendering ---------- */
+
+function showResults(r){
+  $("resTitle").textContent = r.isPB ? "New Personal Best! 🏆" : "Session Complete";
+  $("resSubtitle").textContent = `${r.modeLabel}${r.lang?(" · "+CATEGORY_LABELS[r.lang]):""} · ${r.duration}s`;
+  $("hWpm").textContent = r.wpm;
+  $("hAcc").textContent = r.acc+"%";
+  $("hCons").textContent = r.consistency+"%";
+  $("hPct").textContent = "Top "+(100-r.percentile)+"%";
+
+  const detailGrid = $("detailGrid");
+  detailGrid.innerHTML = "";
+  const details = [
+    ["Raw WPM", r.raw], ["Correct Chars", r.correctChars], ["Incorrect", r.incorrectChars],
+    ["Extra", r.extra], ["Missed", r.missed], ["Completion", r.completion+"%"],
+    ["Best Streak", r.bestStreak], ["Duration", r.duration+"s"]
+  ];
+  details.forEach(([l,v])=>{
+    const cell = document.createElement("div");
+    cell.className = "detail-cell";
+    cell.innerHTML = `<div class="v">${v}</div><div class="l">${l}</div>`;
+    detailGrid.appendChild(cell);
+  });
+
+  renderBadges(r);
+  renderWpmChart(r);
+  renderHeatmap(r);
+  renderSummary(r);
+
+  resultsOverlay.classList.add("show");
+}
+
+function closeResultsOverlay(){
+  resultsOverlay.classList.remove("show");
+}
+
+function renderBadges(r){
+  const row = $("badgesRow");
+  row.innerHTML = "";
+  const badges = [];
+  if(r.isPB) badges.push("🏆 Personal Best");
+  if(r.acc >= 98) badges.push("🎯 Sharpshooter");
+  if(r.wpm >= 80) badges.push("⚡ Speed Demon");
+  if(r.consistency >= 90) badges.push("📊 Metronome");
+  if(r.bestStreak >= 50) badges.push("🔥 "+r.bestStreak+" Streak");
+  if(r.completion >= 100) badges.push("✅ Full Completion");
+  if(badges.length===0) badges.push("🌱 Session Logged");
+  badges.forEach(b=>{
+    const el = document.createElement("div");
+    el.className = "badge";
+    el.textContent = b;
+    row.appendChild(el);
+  });
+}
+
+function renderWpmChart(r){
+  const svg = $("wpmChart");
+  const samples = r.wpmSamples.length ? r.wpmSamples : [{t:0,wpm:r.wpm,acc:r.acc}];
+  const maxWpm = Math.max(...samples.map(s=>s.wpm), r.wpm, 10);
+  const W=600,H=200,pad=24;
+  const stepX = (W-pad*2)/Math.max(samples.length-1,1);
+
+  const wpmPoints = samples.map((s,i)=>{
+    const x = pad + i*stepX;
+    const y = H-pad - (s.wpm/maxWpm)*(H-pad*2);
+    return `${x},${y}`;
+  }).join(" ");
+  const accPoints = samples.map((s,i)=>{
+    const x = pad + i*stepX;
+    const y = H-pad - (s.acc/100)*(H-pad*2);
+    return `${x},${y}`;
+  }).join(" ");
+
+  svg.innerHTML = `
+    <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="var(--line)" stroke-width="1"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="var(--line)" stroke-width="1"/>
+    <polyline points="${accPoints}" fill="none" stroke="var(--blue)" stroke-width="1.5" opacity="0.55"/>
+    <polyline points="${wpmPoints}" fill="none" stroke="var(--amber)" stroke-width="2.5"/>
+    <text x="${pad}" y="16" fill="var(--text-2)" font-size="10" font-family="monospace">WPM</text>
+    <text x="${pad+50}" y="16" fill="var(--blue)" font-size="10" font-family="monospace">Accuracy</text>
+  `;
+}
+
+function renderHeatmap(r){
+  const svg = $("heatChart");
+  const entries = Object.entries(r.mistypedKeys).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  if(entries.length===0){
+    svg.innerHTML = `<text x="20" y="100" fill="var(--text-2)" font-size="12" font-family="monospace">No mistakes recorded — clean run!</text>`;
+    return;
+  }
+  const maxCount = Math.max(...entries.map(e=>e[1]));
+  const cellW = 300/entries.length;
+  let rects = "";
+  entries.forEach(([key,count],i)=>{
+    const intensity = count/maxCount;
+    const h = 20 + intensity*130;
+    const x = i*cellW + 4;
+    const y = 170-h;
+    const color = `rgba(226,100,122,${0.25+intensity*0.6})`;
+    rects += `<rect x="${x}" y="${y}" width="${cellW-8}" height="${h}" fill="${color}" rx="4"/>`;
+    rects += `<text x="${x+(cellW-8)/2}" y="188" fill="var(--text-1)" font-size="11" font-family="monospace" text-anchor="middle">${key==='space'?'␣':key}</text>`;
+    rects += `<text x="${x+(cellW-8)/2}" y="${y-4}" fill="var(--text-2)" font-size="9" font-family="monospace" text-anchor="middle">${count}</text>`;
+  });
+  svg.innerHTML = rects;
+}
+
+function renderSummary(r){
+  const topMistake = Object.entries(r.mistypedKeys).sort((a,b)=>b[1]-a[1])[0];
+  let strength, weakness, suggestion;
+
+  if(r.wpm >= 70) strength = `a strong typing speed of <b>${r.wpm} WPM</b>`;
+  else if(r.wpm >= 40) strength = `a solid, steady pace at <b>${r.wpm} WPM</b>`;
+  else strength = `consistent effort at <b>${r.wpm} WPM</b>, with clear room to build speed`;
+
+  if(r.acc >= 97) weakness = `accuracy is excellent at <b>${r.acc}%</b>`;
+  else if(r.acc >= 90) weakness = `accuracy sits at <b>${r.acc}%</b>, with occasional slips`;
+  else weakness = `accuracy at <b>${r.acc}%</b> is the main area holding back your overall speed`;
+
+  if(r.acc < 92) suggestion = "Slow down slightly and prioritize precision — speed will follow naturally as accuracy improves.";
+  else if(r.consistency < 75) suggestion = "Your pace varies across the session; short warm-up drills before timed tests can help even out your rhythm.";
+  else if(r.wpm < 40) suggestion = "Try shorter, focused bursts (15–30s) to build finger speed before moving to longer sessions.";
+  else suggestion = "You're performing well — try a harder programming language or longer duration to keep progressing.";
+
+  let text = `This session showed ${strength}, and ${weakness}. `;
+  if(topMistake){
+    text += `Your most frequently mistyped key was <b>${topMistake[0]==='space'?'spacebar':topMistake[0]}</b> (${topMistake[1]} times). `;
+  }
+  text += suggestion;
+
+  $("summaryText").innerHTML = text;
+
+  const keysRow = $("mistypedKeys");
+  keysRow.innerHTML = "";
+  Object.entries(r.mistypedKeys).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([k,c])=>{
+    const chip = document.createElement("div");
+    chip.className = "key-chip";
+    chip.textContent = `${k==='space'?'␣':k} × ${c}`;
+    keysRow.appendChild(chip);
+  });
+}
+
+/* ============================================================
+   UI: THEME / FONT / SOUND / SHORTCUTS
+   ============================================================ */
+
+const THEMES = ["dark","light","midnight"];
+function cycleTheme(){
+  const idx = THEMES.indexOf(state.theme);
+  state.theme = THEMES[(idx+1)%THEMES.length];
+  document.body.setAttribute("data-theme", state.theme);
+  localStorage.setItem("tss_theme", state.theme);
+  showToast("Theme: "+state.theme);
+}
+
+function toggleSound(){
+  state.soundOn = !state.soundOn;
+  $("btnSound").textContent = state.soundOn ? "🔊" : "🔇";
+  $("btnSound").classList.toggle("active", state.soundOn);
+  localStorage.setItem("tss_sound", state.soundOn ? "1":"0");
+}
+
+const FONT_SIZES = ["sm","md","lg"];
+function changeFont(delta){
+  let idx = FONT_SIZES.indexOf(state.fontSize);
+  idx = Math.min(FONT_SIZES.length-1, Math.max(0, idx+delta));
+  state.fontSize = FONT_SIZES[idx];
+  document.body.className = "font-"+state.fontSize;
+  localStorage.setItem("tss_font", state.fontSize);
+}
+
+let toastTimer = null;
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 1800);
+}
+
+/* ============================================================
+   EVENT WIRING
+   ============================================================ */
+
+typeStage.addEventListener("click", ()=>{
+  hiddenInput.focus();
+  typeStage.classList.add("focused");
+});
+hiddenInput.addEventListener("blur", ()=> typeStage.classList.remove("focused"));
+document.addEventListener("keydown", handleKeydown);
+
+$("btnRestart").addEventListener("click", restartSession);
+$("btnNew").addEventListener("click", loadNewText);
+$("btnPause").addEventListener("click", ()=>{ state.paused ? resumeSession() : pauseSession(); });
+overlayBtn.addEventListener("click", resumeSession);
+
+$("btnSound").addEventListener("click", toggleSound);
+$("btnTheme").addEventListener("click", cycleTheme);
+$("btnFontMinus").addEventListener("click", ()=>changeFont(-1));
+$("btnFontPlus").addEventListener("click", ()=>changeFont(1));
+$("btnShortcuts").addEventListener("click", ()=> shortcutsPanel.classList.toggle("show"));
+
+$("applyCustom").addEventListener("click", ()=>{
+  const txt = customText.value.trim();
+  if(txt.length < 10){ showToast("Enter at least 10 characters"); return; }
+  state.targetText = txt;
+  resetSessionState();
+  renderText();
+  showToast("Custom text loaded");
+  hiddenInput.focus();
+});
+
+$("closeResults").addEventListener("click", closeResultsOverlay);
+$("resClose").addEventListener("click", closeResultsOverlay);
+$("resRetry").addEventListener("click", ()=>{ closeResultsOverlay(); restartSession(); });
+$("resNew").addEventListener("click", ()=>{ closeResultsOverlay(); loadNewText(); });
+resultsOverlay.addEventListener("click", (e)=>{ if(e.target===resultsOverlay) closeResultsOverlay(); });
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+function init(){
+  const savedTheme = localStorage.getItem("tss_theme");
+  if(savedTheme && THEMES.includes(savedTheme)){ state.theme = savedTheme; document.body.setAttribute("data-theme", savedTheme); }
+  const savedFont = localStorage.getItem("tss_font");
+  if(savedFont && FONT_SIZES.includes(savedFont)){ state.fontSize = savedFont; document.body.className = "font-"+savedFont; }
+  const savedSound = localStorage.getItem("tss_sound");
+  if(savedSound === "0"){ state.soundOn = false; $("btnSound").textContent="🔇"; }
+  $("btnSound").classList.toggle("active", state.soundOn);
+
+  state.mode = "programming"; // default per user's chosen category
+  renderModeBar();
+  renderOptions();
+  loadNewText();
+  renderHistory();
+}
+
+init();
+})();
+</script>
+</body>
+</html>
