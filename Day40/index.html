@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Loom — CSE Study Buddy</title>
+<style>
+  :root{
+    --ink: #eae3d3;
+    --board: #1c2321;
+    --board-deep: #141917;
+    --chalk-green: #3f6a56;
+    --rail: #2a332f;
+    --accent: #e0a94a;
+    --accent-soft: #e0a94a33;
+    --card: #232b28;
+    --card-line: #3a453f;
+    --danger: #c96455;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  @font-face {
+    font-family: 'Fraunces';
+    src: local('Georgia');
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    background: var(--board-deep);
+    color: var(--ink);
+    font-family: var(--font-body);
+    min-height:100vh;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.02), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(255,255,255,0.015), transparent 45%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.008) 0px, rgba(255,255,255,0.008) 1px, transparent 1px, transparent 3px);
+    background-color: var(--board);
+  }
+
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:22px;
+    border-bottom: 1px solid var(--rail);
+    margin-bottom: 28px;
+    flex-wrap:wrap;
+  }
+
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+
+  .brand .mark{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing: 0.24em;
+    text-transform:uppercase;
+    color: var(--chalk-green);
+  }
+
+  .brand h1{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 30px;
+    margin: 2px 0 0;
+    letter-spacing: 0.01em;
+  }
+
+  .brand h1 em{
+    font-style:italic;
+    color: var(--accent);
+  }
+
+  .subtitle{
+    font-size:13px;
+    color: #a3ac9f;
+    max-width:260px;
+    text-align:right;
+    font-family: var(--font-mono);
+    line-height:1.5;
+  }
+
+  /* Level selector - looks like a knob rail */
+  .level-rail{
+    display:flex;
+    gap:0;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width:fit-content;
+  }
+  .level-rail button{
+    background:transparent;
+    border:none;
+    color: #9ba39a;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing:0.05em;
+    padding: 8px 16px;
+    border-radius: 7px;
+    cursor:pointer;
+    transition: all 0.25s ease;
+  }
+  .level-rail button.active{
+    background: var(--chalk-green);
+    color: #f2f7f0;
+  }
+  .level-rail button:hover:not(.active){
+    color: var(--ink);
+  }
+
+  /* chat area */
+  .chat{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-height: 280px;
+    margin-bottom: 22px;
+  }
+
+  .empty-state{
+    border: 1px dashed var(--card-line);
+    border-radius: 14px;
+    padding: 40px 28px;
+    text-align:center;
+    color:#8f978c;
+  }
+  .empty-state .glyph{
+    font-family: var(--font-display);
+    font-size:40px;
+    color: var(--accent);
+    margin-bottom:10px;
+    font-style:italic;
+  }
+  .empty-state p{
+    max-width:420px;
+    margin: 6px auto 0;
+    line-height:1.6;
+    font-size:14px;
+  }
+  .chip-row{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .chip{
+    font-family: var(--font-mono);
+    font-size:12px;
+    padding:7px 12px;
+    border:1px solid var(--card-line);
+    border-radius:20px;
+    color: var(--ink);
+    cursor:pointer;
+    background: var(--board-deep);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .chip:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .msg{
+    display:flex;
+    gap:12px;
+    animation: rise 0.4s ease;
+  }
+  @keyframes rise{
+    from{opacity:0; transform: translateY(8px);}
+    to{opacity:1; transform: translateY(0);}
+  }
+
+  .msg .avatar{
+    flex:0 0 34px;
+    width:34px;height:34px;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family: var(--font-mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .msg.user .avatar{ background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+  .msg.tutor .avatar{ background: rgba(63,106,86,0.25); color: #7fb99c; border: 1px solid var(--chalk-green); }
+
+  .bubble{
+    flex:1;
+    background: var(--card);
+    border:1px solid var(--card-line);
+    border-radius: 3px 14px 14px 14px;
+    padding: 14px 18px;
+    line-height:1.65;
+    font-size:15px;
+  }
+  .msg.user .bubble{
+    border-radius: 14px 3px 14px 14px;
+    background: #262019;
+    border-color: #45391f;
+  }
+
+  .bubble p{margin: 0 0 10px;}
+  .bubble p:last-child{margin-bottom:0;}
+  .bubble strong{color:var(--accent);}
+  .bubble code{
+    font-family: var(--font-mono);
+    background: rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    border-radius:4px;
+    font-size:13px;
+  }
+
+  /* Analogy card - the signature element */
+  .analogy-card{
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent);
+    background: linear-gradient(135deg, rgba(224,169,74,0.08), rgba(224,169,74,0.02));
+    padding: 14px 16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .analogy-card::before{
+    content:"ANALOGY";
+    position:absolute;
+    top:8px; right:12px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.15em;
+    color: var(--accent);
+    opacity:0.6;
+  }
+  .analogy-card .analogy-text{
+    font-family: var(--font-display);
+    font-style:italic;
+    font-size:15.5px;
+    color:#f2e3c4;
+    padding-right:70px;
+  }
+
+  .typing-indicator{
+    display:flex;
+    gap:5px;
+    padding: 4px 0;
+  }
+  .typing-indicator span{
+    width:6px;height:6px;
+    border-radius:50%;
+    background: var(--chalk-green);
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing-indicator span:nth-child(2){animation-delay:0.15s;}
+  .typing-indicator span:nth-child(3){animation-delay:0.3s;}
+  @keyframes bounce{
+    0%,60%,100%{transform:translateY(0); opacity:0.5;}
+    30%{transform:translateY(-5px); opacity:1;}
+  }
+
+  .error-bubble{
+    border-color: var(--danger) !important;
+    color: #f0c3ba;
+  }
+
+  /* input dock */
+  .dock{
+    position:sticky;
+    bottom:16px;
+    display:flex;
+    gap:10px;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .dock textarea{
+    flex:1;
+    resize:none;
+    background:transparent;
+    border:none;
+    outline:none;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size:15px;
+    line-height:1.5;
+    padding: 8px 8px;
+    max-height: 140px;
+  }
+  .dock textarea::placeholder{ color:#6b736a; }
+
+  .dock button.send{
+    flex:0 0 auto;
+    align-self:flex-end;
+    background: var(--chalk-green);
+    color: #f2f7f0;
+    border:none;
+    border-radius:9px;
+    padding: 10px 18px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .dock button.send:hover{ background:#4e7f68; }
+  .dock button.send:active{ transform: scale(0.96); }
+  .dock button.send:disabled{
+    background: #384039;
+    color:#7a827a;
+    cursor:not-allowed;
+  }
+
+  /* docs panel */
+  .docs{
+    margin-top: 46px;
+    border-top: 1px solid var(--rail);
+    padding-top: 18px;
+  }
+  .docs summary{
+    cursor:pointer;
+    font-family: var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color: #8f978c;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    list-style:none;
+  }
+  .docs summary::-webkit-details-marker{display:none;}
+  .docs summary::before{
+    content:"+";
+    font-family: var(--font-display);
+    font-size:16px;
+    color: var(--accent);
+    transition: transform 0.2s;
+  }
+  .docs[open] summary::before{ content:"−"; }
+  .docs-body{
+    padding: 18px 4px 4px;
+    font-size:13.5px;
+    line-height:1.7;
+    color:#b6bdb2;
+  }
+  .docs-body h4{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color: var(--accent);
+    margin: 20px 0 6px;
+  }
+  .docs-body h4:first-child{margin-top:0;}
+  .docs-body ul{margin:6px 0; padding-left:18px;}
+
+  @media (max-width:600px){
+    .subtitle{display:none;}
+    .wrap{padding:24px 14px 60px;}
+    .brand h1{font-size:24px;}
+  }
+
+  ::selection{ background: var(--accent-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <span class="mark">Concept Loom</span>
+      <h1>Untangle <em>one</em> idea at a time</h1>
+    </div>
+    <div class="subtitle">A patient CSE tutor. Ask about one confusing topic — get an explanation that actually sticks.</div>
+  </header>
+
+  <div class="level-rail" id="levelRail">
+    <button data-level="beginner" class="active">Beginner</button>
+    <button data-level="intermediate">Intermediate</button>
+    <button data-level="advanced">Advanced</button>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="empty-state" id="emptyState">
+      <div class="glyph">?</div>
+      <p>Type any CSE concept you're stuck on — recursion, TCP handshakes, mutex locks, B-trees, whatever it is. I'll explain it plainly, give you an analogy that sticks, and check you actually get it.</p>
+      <div class="chip-row">
+        <div class="chip" data-fill="Why does recursion actually work? I understand the syntax but not the intuition.">Recursion intuition</div>
+        <div class="chip" data-fill="What's the real difference between a process and a thread?">Process vs thread</div>
+        <div class="chip" data-fill="Explain how a hash map achieves O(1) lookup, in plain terms.">Hash map O(1)</div>
+        <div class="chip" data-fill="What actually happens during a TCP three-way handshake?">TCP handshake</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <textarea id="input" rows="1" placeholder="Ask about a concept you're stuck on…"></textarea>
+    <button class="send" id="sendBtn">Ask →</button>
+  </div>
+
+  <details class="docs">
+    <summary>How this was built</summary>
+    <div class="docs-body">
+      <h4>System prompt design</h4>
+      <p>The tutor's brain is one system prompt with four jobs: (1) stay scoped to CSE/programming concepts and gently redirect off-topic asks, (2) always produce a plain-language explanation before any formal definition, (3) always include exactly one vivid analogy per response, wrapped so the UI can render it in its own card, and (4) close by checking understanding with a small question rather than assuming the explanation landed. Difficulty level is injected as a variable so the same prompt scales from beginner to advanced without rewriting it.</p>
+
+      <h4>UI decisions</h4>
+      <ul>
+        <li><strong>Chalkboard-meets-notebook palette</strong> instead of the usual dark-mode-with-neon-accent: deep green-black board tones with a warm amber accent, because the brief is about a human tutor's patience, not a SaaS dashboard.</li>
+        <li><strong>The analogy card</strong> is the signature element — every tutor reply that contains an analogy gets it visually separated into its own amber-bordered card, because the analogy is the actual "aha" moment and deserves to be found at a glance, not buried in prose.</li>
+        <li>Level rail sits above the chat because it changes how every future answer is phrased, so it needed to feel like a standing setting, not a one-off input.</li>
+        <li>Empty state offers real, working starter questions so a first-time user isn't staring at a blank box.</li>
+      </ul>
+
+      <h4>Engineering notes</h4>
+      <ul>
+        <li>Single HTML file, no build step, no external libraries. Fonts fall back gracefully if unavailable.</li>
+        <li>Calls <code>api.anthropic.com/v1/messages</code> directly via fetch with the full running conversation sent each turn (the API is stateless).</li>
+        <li>Analogy detection is done by asking the model to wrap its analogy in <code>[[ANALOGY]]...[[/ANALOGY]]</code> markers, which the client parses into the styled card — no regex guessing over free prose.</li>
+        <li>Handles empty state, in-flight loading (animated typing dots), and network/API errors (inline error bubble with a retry-friendly message) as first-class states, not afterthoughts.</li>
+      </ul>
+
+      <h4>Where this goes next</h4>
+      <ul>
+        <li><strong>Memory:</strong> persist which concepts a student has asked about across sessions, so the tutor can say "last time you were stuck on recursion — this builds on that."</li>
+        <li><strong>Tools:</strong> a code-execution tool so the tutor can generate and actually run a tiny snippet live to prove a concept (e.g. show recursion's call stack growing).</li>
+        <li><strong>Multi-step workflows:</strong> an optional "quiz me" mode that chains three escalating questions and adapts the next one based on whether the last was answered correctly.</li>
+        <li><strong>Multi-modal:</strong> auto-generate a simple inline diagram (SVG) alongside the analogy for spatial concepts like memory layout or network handshakes.</li>
+      </ul>
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  const SYSTEM_PROMPT_TEMPLATE = `You are Concept Loom, a warm, endlessly patient one-on-one tutor for Computer Science & Engineering undergraduates. Your entire job in a session is to help the student deeply understand ONE concept they are stuck on — not to cover a syllabus, not to dump a textbook chapter.
+
+SCOPE
+- Only discuss CSE / programming / computing concepts (data structures, algorithms, OS, networks, databases, architecture, math-for-CS, etc.).
+- If the student asks something clearly outside this scope (e.g. personal advice, unrelated trivia), gently redirect: acknowledge it, then invite them back to a CSE concept, in one short sentence. Do not lecture them about your limitations.
+
+CURRENT DIFFICULTY LEVEL: {{LEVEL}}
+- beginner: assume no prior CS vocabulary. Avoid jargon or define it immediately in-line. Favor everyday analogies over technical ones.
+- intermediate: assume comfort with basic programming and core CS terms (arrays, functions, big-O). You can reference related concepts by name without re-explaining them from scratch.
+- advanced: assume strong fundamentals. Be precise, use correct terminology freely, and go a level deeper into "why" and edge cases/trade-offs rather than basics.
+
+RESPONSE SHAPE (every single reply, without exception)
+1. Open with a plain-language explanation of the concept in 2-4 sentences, in your own words, no jargon left undefined.
+2. Include exactly ONE vivid, concrete analogy that maps cleanly onto the concept. Wrap ONLY the analogy sentence(s) — nothing else — like this: [[ANALOGY]]your analogy here[[/ANALOGY]]. This marker is required whenever you give a fresh explanation of a concept (not required on short clarifying replies or acknowledgements).
+3. If useful, add a short concrete example (code, a tiny trace-through, or numbers) — keep it tight, not a wall of text.
+4. Close with ONE short, specific question that checks whether the explanation actually landed (e.g. asking them to restate a part in their own words, or apply it to a small variant). Never just say "does that make sense?" — make the check specific to what you just taught.
+
+TONE
+Friendly, encouraging mentor. Warm but not saccharine — celebrate small wins genuinely, never sound patronizing, never pad with excessive praise. If the student got something wrong, correct it kindly and directly, without dwelling on the mistake.
+
+EDGE CASES
+- If the student's question is too broad ("explain OS to me"), ask them to narrow it to the one sub-part that's actually confusing them, offering 2-3 concrete narrower options.
+- If the student seems to already understand and is just asking you to confirm, validate specifically what they got right rather than re-explaining everything.
+- If asked to just "give the answer" to what looks like a graded assignment/exam question verbatim, instead teach the underlying concept so they can derive the answer themselves.
+- Keep responses focused — prefer fewer, well-chosen words over exhaustive coverage. This is a conversation, not a chapter.
+- Never break the [[ANALOGY]] marker format, and never nest or duplicate it within one reply.`;
+
+  const chat = document.getElementById('chat');
+  const emptyState = document.getElementById('emptyState');
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('sendBtn');
+  const levelRail = document.getElementById('levelRail');
+
+  let level = 'beginner';
+  let history = []; // {role, content}
+  let busy = false;
+
+  levelRail.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    level = btn.dataset.level;
+    [...levelRail.children].forEach(b => b.classList.toggle('active', b === btn));
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      input.value = chip.dataset.fill;
+      input.focus();
+      autoGrow();
+    });
+  });
+
+  function autoGrow(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  }
+  input.addEventListener('input', autoGrow);
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      send();
+    }
+  });
+  sendBtn.addEventListener('click', send);
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderMarkdownish(text){
+    // minimal, safe formatting: escape first, then re-apply a few patterns
+    let safe = escapeHtml(text);
+    safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/`([^`]+?)`/g, '<code>$1</code>');
+    return safe.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+  }
+
+  function parseAnalogy(raw){
+    const match = raw.match(/\[\[ANALOGY\]\]([\s\S]*?)\[\[\/ANALOGY\]\]/);
+    if(!match) return { main: raw, analogy: null };
+    const analogy = match[1].trim();
+    const main = raw.replace(match[0], '').trim();
+    return { main, analogy };
+  }
+
+  function addMessage(role, text, opts={}){
+    if(emptyState) emptyState.remove();
+    const msg = document.createElement('div');
+    msg.className = `msg ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? 'YOU' : 'CL';
+    msg.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble' + (opts.error ? ' error-bubble' : '');
+
+    if(opts.loading){
+      bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+    } else if(role === 'tutor' && !opts.error){
+      const { main, analogy } = parseAnalogy(text);
+      bubble.innerHTML = renderMarkdownish(main);
+      if(analogy){
+        const card = document.createElement('div');
+        card.className = 'analogy-card';
+        card.innerHTML = `<div class="analogy-text">${renderMarkdownish(analogy)}</div>`;
+        bubble.appendChild(card);
+      }
+    } else {
+      bubble.innerHTML = renderMarkdownish(text);
+    }
+
+    msg.appendChild(bubble);
+    chat.appendChild(msg);
+    msg.scrollIntoView({ behavior:'smooth', block:'end' });
+    return msg;
+  }
+
+  async function send(){
+    const text = input.value.trim();
+    if(!text || busy) return;
+
+    input.value = '';
+    autoGrow();
+    addMessage('user', text);
+    history.push({ role: 'user', content: text });
+
+    busy = true;
+    sendBtn.disabled = true;
+    const loadingMsg = addMessage('tutor', '', { loading:true });
+
+    const systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{{LEVEL}}', level);
+
+    try{
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: history
+        })
+      });
+
+      if(!response.ok){
+        throw new Error(`API responded with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+      const fullText = textBlocks.join('\n').trim();
+
+      if(!fullText){
+        throw new Error('empty-response');
+      }
+
+      loadingMsg.remove();
+      addMessage('tutor', fullText);
+      history.push({ role: 'assistant', content: fullText });
+
+    } catch(err){
+      loadingMsg.remove();
+      addMessage('tutor', "Something broke on my end reaching the tutor. Check your connection and try asking again — nothing you typed was lost.", { error:true });
+      console.error('Concept Loom error:', err);
+    } finally {
+      busy = false;
+      sendBtn.disabled = false;
+    }
+  }
+})();
+</script>
+</body>
+</html>
