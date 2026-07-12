@@ -1,0 +1,2468 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Learning Studio — JavaScript Fundamentals</title>
+    <style>
+      :root {
+        --bg: #0b0e14;
+        --bg2: #11151f;
+        --panel: #151a26;
+        --panel2: #1b2130;
+        --line: #252c3d;
+        --text: #e6e9f0;
+        --muted: #8b93a7;
+        --yellow: #f0db4f;
+        --yellow-dim: #8a7f2e;
+        --violet: #a78bfa;
+        --green: #4ade80;
+        --red: #f87171;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: radial-gradient(
+          circle at 20% 0%,
+          #141a28 0%,
+          var(--bg) 45%
+        );
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.6;
+        padding-bottom: 80px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      /* ---------- top progress bar ---------- */
+      #progressBar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--yellow), var(--violet));
+        width: 0%;
+        z-index: 999;
+        transition: width 0.4s ease;
+      }
+
+      /* ---------- header ---------- */
+      header.hero {
+        padding: 70px 8vw 50px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      header.hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, transparent 0%, var(--bg) 100%),
+          repeating-linear-gradient(
+            90deg,
+            rgba(240, 219, 79, 0.03) 0px,
+            rgba(240, 219, 79, 0.03) 1px,
+            transparent 1px,
+            transparent 40px
+          );
+        pointer-events: none;
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        color: var(--yellow);
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .eyebrow::before {
+        content: "▸";
+        color: var(--violet);
+      }
+      h1.title {
+        font-family: var(--mono);
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 14px;
+      }
+      h1.title span {
+        color: var(--yellow);
+      }
+      .subtitle {
+        color: var(--muted);
+        max-width: 640px;
+        font-size: 1.05rem;
+        margin-bottom: 36px;
+      }
+
+      .console {
+        background: #080a10;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        font-family: var(--mono);
+        font-size: 0.92rem;
+        max-width: 640px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+      }
+      .console .bar {
+        background: #10131c;
+        padding: 10px 14px;
+        display: flex;
+        gap: 7px;
+        border-bottom: 1px solid var(--line);
+      }
+      .console .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .console .dot.r {
+        background: #ff5f56;
+      }
+      .console .dot.y {
+        background: #ffbd2e;
+      }
+      .console .dot.g {
+        background: #27c93f;
+      }
+      .console .body {
+        padding: 16px 18px;
+        color: #9dd67a;
+        white-space: pre-wrap;
+        min-height: 70px;
+      }
+      .console .body .prompt {
+        color: var(--violet);
+      }
+      .caret {
+        display: inline-block;
+        width: 8px;
+        background: var(--yellow);
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        margin-top: 40px;
+        max-width: 900px;
+      }
+      .meta-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .meta-card .label {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--yellow);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .meta-card .value {
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+
+      .reward-strip {
+        margin-top: 26px;
+        max-width: 900px;
+        background: linear-gradient(
+          90deg,
+          rgba(167, 139, 250, 0.09),
+          rgba(240, 219, 79, 0.06)
+        );
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .reward-strip .badge {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        padding: 5px 10px;
+        border-radius: 20px;
+        color: var(--violet);
+      }
+
+      /* ---------- nav / progress rail ---------- */
+      .rail {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(11, 14, 20, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+        padding: 10px 8vw;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .rail .step {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+        background: var(--panel);
+      }
+      .rail .step.active {
+        color: var(--bg);
+        background: var(--yellow);
+        border-color: var(--yellow);
+        font-weight: 700;
+      }
+      .rail .step.done {
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .rail .step .chk {
+        font-size: 0.8rem;
+      }
+
+      main {
+        padding: 0 8vw;
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+
+      section.module {
+        padding: 70px 0;
+        border-bottom: 1px solid var(--line);
+        opacity: 0.35;
+        filter: blur(0.3px);
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      section.module.unlocked {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      section.module .lock-note {
+        font-family: var(--mono);
+        color: var(--muted);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .mod-head {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+      .mod-num {
+        font-family: var(--mono);
+        color: var(--yellow-dim);
+        font-size: 2.6rem;
+        font-weight: 700;
+        opacity: 0.5;
+      }
+      .mod-title {
+        font-family: var(--mono);
+        font-size: 1.7rem;
+        font-weight: 700;
+      }
+      .mod-tag {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--violet);
+        border: 1px solid var(--violet);
+        padding: 3px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .mod-desc {
+        color: var(--muted);
+        max-width: 720px;
+        margin: 14px 0 30px;
+      }
+
+      h3.section-h {
+        font-family: var(--mono);
+        font-size: 1.05rem;
+        color: var(--yellow);
+        margin: 34px 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h3.section-h::before {
+        content: "//";
+        color: var(--muted);
+      }
+
+      p {
+        margin-bottom: 12px;
+        color: #c9cedb;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 16px;
+      }
+
+      pre.code {
+        background: #080a10;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 0.87rem;
+        color: #d4d9e5;
+        margin: 14px 0;
+        line-height: 1.55;
+      }
+      pre.code .c {
+        color: #6a7280;
+      }
+      pre.code .k {
+        color: var(--violet);
+      }
+      pre.code .s {
+        color: var(--green);
+      }
+      pre.code .f {
+        color: var(--yellow);
+      }
+
+      .analogy {
+        border-left: 3px solid var(--violet);
+        background: rgba(167, 139, 250, 0.06);
+        padding: 14px 18px;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        margin: 16px 0;
+      }
+      .analogy .tag {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--violet);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 16px 0;
+      }
+      @media (max-width: 640px) {
+        .compare {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compare .col {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .compare .col h4 {
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        color: var(--yellow);
+        margin-bottom: 8px;
+      }
+      .compare .col ul {
+        padding-left: 18px;
+        color: #c9cedb;
+        font-size: 0.92rem;
+      }
+      .compare .col li {
+        margin-bottom: 6px;
+      }
+
+      .misconception {
+        border-left: 3px solid var(--red);
+        background: rgba(248, 113, 113, 0.06);
+        padding: 14px 18px;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        margin: 10px 0;
+      }
+      .misconception .tag {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--red);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+      }
+
+      .takeaways {
+        background: var(--panel2);
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin: 18px 0;
+      }
+      .takeaways ul {
+        padding-left: 20px;
+      }
+      .takeaways li {
+        margin-bottom: 6px;
+        color: #dfe3ec;
+      }
+
+      /* interactive playground */
+      .playground {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin: 18px 0;
+      }
+      .playground .ph {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--violet);
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .playground textarea {
+        width: 100%;
+        min-height: 110px;
+        background: #080a10;
+        color: #e6e9f0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 0.87rem;
+        padding: 12px;
+        resize: vertical;
+      }
+      .playground button {
+        margin-top: 10px;
+        background: var(--yellow);
+        color: #111;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: 0.15s;
+      }
+      .playground button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px -6px rgba(240, 219, 79, 0.5);
+      }
+      .playground .out {
+        margin-top: 10px;
+        background: #080a10;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        color: var(--green);
+        min-height: 30px;
+        white-space: pre-wrap;
+      }
+
+      /* exercise */
+      .exercise {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin: 18px 0;
+        background: linear-gradient(180deg, var(--panel), var(--panel2));
+      }
+      .exercise .ex-tag {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--bg);
+        background: var(--green);
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      /* quiz */
+      .quiz {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px 26px 30px;
+        margin-top: 40px;
+      }
+      .quiz h3 {
+        font-family: var(--mono);
+        font-size: 1.2rem;
+        color: var(--yellow);
+        margin-bottom: 4px;
+      }
+      .quiz .quiz-sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 22px;
+      }
+      .qcard {
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+      .qcard:last-of-type {
+        border-bottom: none;
+      }
+      .qcard .qtext {
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .qopts {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .qopt {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.92rem;
+        transition: 0.15s;
+      }
+      .qopt:hover {
+        border-color: var(--violet);
+      }
+      .qopt.selected {
+        border-color: var(--violet);
+        background: rgba(167, 139, 250, 0.1);
+      }
+      .qopt.correct {
+        border-color: var(--green);
+        background: rgba(74, 222, 128, 0.12);
+      }
+      .qopt.incorrect {
+        border-color: var(--red);
+        background: rgba(248, 113, 113, 0.12);
+      }
+      .qexplain {
+        display: none;
+        margin-top: 10px;
+        font-size: 0.86rem;
+        color: var(--muted);
+        background: var(--panel2);
+        padding: 10px 12px;
+        border-radius: 8px;
+      }
+      .qexplain.show {
+        display: block;
+      }
+      .quiz-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .btn-primary {
+        background: var(--yellow);
+        color: #111;
+        border: none;
+        padding: 11px 22px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .btn-primary:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--line);
+        padding: 11px 22px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        cursor: pointer;
+      }
+      .quiz-result {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        display: none;
+      }
+      .quiz-result.show {
+        display: block;
+      }
+      .quiz-result.pass {
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid var(--green);
+        color: var(--green);
+      }
+      .quiz-result.retry {
+        background: rgba(248, 113, 113, 0.1);
+        border: 1px solid var(--red);
+        color: var(--red);
+      }
+
+      /* final section */
+      .final-section {
+        padding: 70px 0;
+      }
+      .cheat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .cheat-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .cheat-card h4 {
+        font-family: var(--mono);
+        color: var(--yellow);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+      .cheat-card pre {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: #c9cedb;
+        white-space: pre-wrap;
+      }
+
+      .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .resource-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px;
+      }
+      .resource-card h4 {
+        font-family: var(--mono);
+        color: var(--violet);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+      }
+      .resource-card ul {
+        padding-left: 18px;
+        font-size: 0.9rem;
+        color: #c9cedb;
+      }
+      .resource-card li {
+        margin-bottom: 7px;
+      }
+
+      .kw {
+        display: inline-block;
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        color: var(--yellow);
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        padding: 5px 10px;
+        border-radius: 6px;
+        margin: 4px 6px 0 0;
+      }
+
+      .print-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--violet);
+        color: #111;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-family: var(--mono);
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 30px -8px rgba(167, 139, 250, 0.6);
+        z-index: 100;
+      }
+
+      .certificate {
+        margin-top: 30px;
+        background: linear-gradient(
+          135deg,
+          rgba(240, 219, 79, 0.08),
+          rgba(167, 139, 250, 0.08)
+        );
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 30px;
+        text-align: center;
+        display: none;
+      }
+      .certificate.show {
+        display: block;
+      }
+      .certificate .cert-title {
+        font-family: var(--mono);
+        font-size: 1.4rem;
+        color: var(--yellow);
+        margin-bottom: 10px;
+      }
+
+      @media print {
+        .rail,
+        .print-btn,
+        .console .caret {
+          display: none !important;
+        }
+        section.module {
+          opacity: 1 !important;
+          filter: none !important;
+          border: none;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progressBar"></div>
+
+    <header class="hero" id="intro">
+      <div class="eyebrow">Interactive Learning Studio</div>
+      <h1 class="title">JavaScript <span>Fundamentals</span></h1>
+      <p class="subtitle">
+        A complete, self-contained tutorial covering the core mechanics of
+        JavaScript — from variables and the type system to functions, scope,
+        closures, objects, arrays, and the DOM — built for engineers who want to
+        actually understand the language, not memorize snippets.
+      </p>
+
+      <div class="console">
+        <div class="bar">
+          <span class="dot r"></span><span class="dot y"></span
+          ><span class="dot g"></span>
+        </div>
+        <div class="body" id="consoleBody">
+          <span class="prompt">&gt;</span> <span id="consoleText"></span
+          ><span class="caret">&nbsp;</span>
+        </div>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-card">
+          <div class="label">Learning Objectives</div>
+          <div class="value">
+            Master variables, types, functions, scope, closures, objects/arrays
+            &amp; DOM basics
+          </div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Estimated Time</div>
+          <div class="value">~2.5 – 3 hours</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Prerequisites</div>
+          <div class="value">
+            Basic HTML/CSS familiarity; no prior JS needed
+          </div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Expected Outcome</div>
+          <div class="value">
+            Write, read and debug real JS programs confidently
+          </div>
+        </div>
+      </div>
+
+      <div class="reward-strip">
+        <span class="badge">🏆 4 Module Badges</span>
+        <span class="badge">⚡ XP: <span id="xpDisplay">0</span> / 400</span>
+        <span class="badge"
+          >🎯 Quiz Pass Rate: <span id="passRate">0%</span></span
+        >
+        <span class="badge">📜 Certificate on Completion</span>
+      </div>
+    </header>
+
+    <nav class="rail" id="rail">
+      <div class="step active" data-target="intro">
+        <span class="chk">●</span> Intro
+      </div>
+      <div class="step" data-target="mod1">
+        <span class="chk">○</span> 1. Values &amp; Types
+      </div>
+      <div class="step" data-target="mod2">
+        <span class="chk">○</span> 2. Functions &amp; Scope
+      </div>
+      <div class="step" data-target="mod3">
+        <span class="chk">○</span> 3. Objects &amp; Arrays
+      </div>
+      <div class="step" data-target="mod4">
+        <span class="chk">○</span> 4. Closures &amp; DOM
+      </div>
+      <div class="step" data-target="final">
+        <span class="chk">○</span> Final Challenge
+      </div>
+    </nav>
+
+    <main>
+      <!-- ===================== MODULE 1 ===================== -->
+      <section class="module unlocked" id="mod1">
+        <div class="mod-head">
+          <span class="mod-num">01</span>
+          <span class="mod-title">Values, Variables &amp; Types</span>
+          <span class="mod-tag">Foundation</span>
+        </div>
+        <p class="mod-desc">
+          Every JS program is a story about values moving through variables.
+          This module builds the vocabulary — <code>let</code>,
+          <code>const</code>, primitive types, and how JavaScript quietly
+          converts between them — that every later module depends on.
+        </p>
+
+        <h3 class="section-h">Explanation</h3>
+        <div class="card">
+          <p>
+            <strong>Variables</strong> are named boxes that hold a reference to
+            a value. Declare them with <code>let</code> (reassignable) or
+            <code>const</code> (cannot be reassigned — though the value it
+            points to can still be mutated if it's an object). Avoid
+            <code>var</code>: it's function-scoped and hoists in confusing ways,
+            a leftover from JS's earliest days.
+          </p>
+          <p>
+            JavaScript has seven <strong>primitive types</strong> —
+            <code>string</code>, <code>number</code>, <code>boolean</code>,
+            <code>undefined</code>, <code>null</code>, <code>symbol</code>,
+            <code>bigint</code> — plus <code>object</code> (which covers
+            objects, arrays, and functions). Primitives are compared and copied
+            by value; objects are compared and copied by reference.
+          </p>
+        </div>
+
+        <pre class="code"><span class="c">// declaring and typing values</span>
+<span class="k">const</span> price = <span class="f">499</span>;          <span class="c">// number, cannot be reassigned</span>
+<span class="k">let</span> currency = <span class="s">"INR"</span>;       <span class="c">// string, can change later</span>
+<span class="k">let</span> inStock = <span class="f">true</span>;         <span class="c">// boolean</span>
+<span class="k">let</span> discount;                <span class="c">// undefined — declared, no value yet</span>
+
+<span class="k">console</span>.log(<span class="k">typeof</span> price);   <span class="c">// "number"</span>
+<span class="k">console</span>.log(<span class="k">typeof</span> currency);<span class="c">// "string"</span></pre>
+
+        <div class="analogy">
+          <div class="tag">Analogy</div>
+          <p>
+            <code>const</code> is like writing a name on a parking spot with
+            permanent marker — the spot itself is fixed, but if a car (object)
+            is parked there, you can still repaint the car. <code>let</code> is
+            a spot with a whiteboard label you can erase and rewrite.
+          </p>
+        </div>
+
+        <h3 class="section-h">Comparison</h3>
+        <div class="compare">
+          <div class="col">
+            <h4>let</h4>
+            <ul>
+              <li>Block-scoped</li>
+              <li>Can be reassigned</li>
+              <li>Not hoisted usably (temporal dead zone)</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>const</h4>
+            <ul>
+              <li>Block-scoped</li>
+              <li>Cannot be reassigned</li>
+              <li>Object contents can still change</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="section-h">Type Coercion Diagram</h3>
+        <div class="card">
+          <svg viewBox="0 0 600 140" style="width: 100%; height: auto">
+            <rect
+              x="10"
+              y="40"
+              width="140"
+              height="60"
+              rx="8"
+              fill="#1b2130"
+              stroke="#252c3d"
+            />
+            <text
+              x="80"
+              y="75"
+              fill="#f0db4f"
+              font-family="monospace"
+              font-size="14"
+              text-anchor="middle"
+            >
+              "5" + 3
+            </text>
+            <path
+              d="M150 70 L 260 70"
+              stroke="#a78bfa"
+              stroke-width="2"
+              marker-end="url(#arrow)"
+            />
+            <text
+              x="205"
+              y="60"
+              fill="#8b93a7"
+              font-family="monospace"
+              font-size="11"
+              text-anchor="middle"
+            >
+              coerce to string
+            </text>
+            <rect
+              x="260"
+              y="40"
+              width="140"
+              height="60"
+              rx="8"
+              fill="#1b2130"
+              stroke="#252c3d"
+            />
+            <text
+              x="330"
+              y="75"
+              fill="#4ade80"
+              font-family="monospace"
+              font-size="14"
+              text-anchor="middle"
+            >
+              "53"
+            </text>
+            <path
+              d="M410 70 L 460 70"
+              stroke="#8b93a7"
+              stroke-width="2"
+              stroke-dasharray="4"
+            />
+            <rect
+              x="460"
+              y="40"
+              width="130"
+              height="60"
+              rx="8"
+              fill="#1b2130"
+              stroke="#252c3d"
+            />
+            <text
+              x="525"
+              y="65"
+              fill="#f87171"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              "5" - 3
+            </text>
+            <text
+              x="525"
+              y="85"
+              fill="#4ade80"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              → 2 (number)
+            </text>
+            <defs>
+              <marker
+                id="arrow"
+                markerWidth="8"
+                markerHeight="8"
+                refX="6"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#a78bfa" />
+              </marker>
+            </defs>
+          </svg>
+          <p style="color: var(--muted); font-size: 0.85rem">
+            "+" prefers string concatenation when either side is a string; other
+            arithmetic operators coerce toward numbers. This asymmetry is one of
+            JS's most famous gotchas.
+          </p>
+        </div>
+
+        <h3 class="section-h">Try It</h3>
+        <div class="playground">
+          <div class="ph">Playground — edit and run</div>
+          <textarea id="pg1">
+console.log(typeof "5" + 3);
+console.log("5" - 3);
+console.log(1 + 1 + "1");</textarea
+          >
+          <button onclick="runPG('pg1', 'out1')">▶ Run Code</button>
+          <div class="out" id="out1">// output appears here</div>
+        </div>
+
+        <div class="misconception">
+          <div class="tag">Common Misconception</div>
+          <p>
+            <code>const</code> does <em>not</em> make a value immutable — it
+            only prevents reassignment of the variable.
+            <code>const arr = [1,2]; arr.push(3)</code> is perfectly legal.
+          </p>
+        </div>
+
+        <h3 class="section-h">Exercise</h3>
+        <div class="exercise">
+          <span class="ex-tag">Exercise 1.1</span>
+          <p>
+            Predict the output of <code>console.log(typeof null)</code> before
+            running it in the playground above. (Hint: it's a famous historical
+            bug in JS that can never be fixed for compatibility reasons.)
+          </p>
+        </div>
+
+        <div class="takeaways">
+          <h3 class="section-h" style="margin-top: 0">Key Takeaways</h3>
+          <ul>
+            <li>
+              Prefer <code>const</code> by default; use <code>let</code> only
+              when reassignment is needed. Avoid <code>var</code>.
+            </li>
+            <li>Primitives copy by value; objects/arrays copy by reference.</li>
+            <li>
+              <code>+</code> coerces to string if either operand is a string;
+              other math operators coerce to number.
+            </li>
+            <li>
+              <code>typeof null</code> returns <code>"object"</code> — a
+              decades-old bug kept for backward compatibility.
+            </li>
+          </ul>
+        </div>
+
+        <div class="quiz" id="quiz1">
+          <h3>Module 1 Quiz</h3>
+          <div class="quiz-sub">Answer all 4 questions to unlock Module 2.</div>
+          <div id="quiz1-body"></div>
+          <div class="quiz-actions">
+            <button
+              class="btn-primary"
+              id="quiz1-submit"
+              onclick="submitQuiz(1)"
+            >
+              Submit Answers
+            </button>
+            <button
+              class="btn-secondary"
+              id="quiz1-retry"
+              onclick="resetQuiz(1)"
+              style="display: none"
+            >
+              Retry Quiz
+            </button>
+          </div>
+          <div class="quiz-result" id="quiz1-result"></div>
+        </div>
+      </section>
+
+      <!-- ===================== MODULE 2 ===================== -->
+      <section class="module" id="mod2">
+        <div class="lock-note" id="lock2">
+          🔒 Complete Module 1 quiz to unlock
+        </div>
+        <div class="mod-head">
+          <span class="mod-num">02</span>
+          <span class="mod-title">Functions &amp; Scope</span>
+          <span class="mod-tag">Building Blocks</span>
+        </div>
+        <p class="mod-desc">
+          Functions are how you package behavior. This module covers
+          declarations vs expressions vs arrow functions, parameters, return
+          values, and how scope decides what a piece of code can "see."
+        </p>
+
+        <h3 class="section-h">Explanation</h3>
+        <div class="card">
+          <p>
+            A <strong>function declaration</strong> is hoisted (usable before
+            its definition in the file); a
+            <strong>function expression</strong> or
+            <strong>arrow function</strong> assigned to a variable is not. Arrow
+            functions also don't bind their own <code>this</code> — they inherit
+            it from the surrounding scope, which makes them ideal for callbacks.
+          </p>
+          <p>
+            <strong>Scope</strong> is the region of code where a variable is
+            accessible. JS uses <em>lexical scoping</em>: a function's access to
+            variables is determined by where it's <em>written</em>, not where
+            it's <em>called</em>. Each <code>{ }</code> block creates a new
+            scope for <code>let</code>/<code>const</code>.
+          </p>
+        </div>
+
+        <pre
+          class="code"
+        ><span class="c">// three ways to write "the same" function</span>
+<span class="k">function</span> greet(name) { <span class="k">return</span> <span class="s">`Hello, ${name}`</span>; }         <span class="c">// declaration — hoisted</span>
+<span class="k">const</span> greet2 = <span class="k">function</span>(name) { <span class="k">return</span> <span class="s">`Hi, ${name}`</span>; }; <span class="c">// expression</span>
+<span class="k">const</span> greet3 = (name) => <span class="s">`Hey, ${name}`</span>;                    <span class="c">// arrow</span>
+
+<span class="k">function</span> outer() {
+  <span class="k">let</span> secret = <span class="s">"visible only inside outer"</span>;
+  <span class="k">function</span> inner() { <span class="k">console</span>.log(secret); } <span class="c">// inner can "see" secret</span>
+  inner();
+}
+outer();</pre>
+
+        <div class="analogy">
+          <div class="tag">Analogy</div>
+          <p>
+            Scope is like rooms in a house with one-way glass. A room can see
+            everything in the rooms that contain it (its parents), but parent
+            rooms can't see inside child rooms. Variables declared in an inner
+            room simply don't exist once you step outside it.
+          </p>
+        </div>
+
+        <h3 class="section-h">Comparison</h3>
+        <div class="compare">
+          <div class="col">
+            <h4>Regular function</h4>
+            <ul>
+              <li>Own <code>this</code> binding</li>
+              <li>Hoisted (if declaration)</li>
+              <li>Has <code>arguments</code> object</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>Arrow function</h4>
+            <ul>
+              <li>Inherits <code>this</code> from enclosing scope</li>
+              <li>Not hoisted the same way</li>
+              <li>No own <code>arguments</code> object</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="section-h">Scope Chain Diagram</h3>
+        <div class="card">
+          <svg
+            viewBox="0 0 500 220"
+            style="
+              width: 100%;
+              max-width: 420px;
+              display: block;
+              margin: 0 auto;
+            "
+          >
+            <rect
+              x="20"
+              y="20"
+              width="460"
+              height="180"
+              rx="10"
+              fill="#1b2130"
+              stroke="#252c3d"
+            />
+            <text
+              x="40"
+              y="45"
+              fill="#f0db4f"
+              font-family="monospace"
+              font-size="12"
+            >
+              Global Scope
+            </text>
+            <rect
+              x="50"
+              y="60"
+              width="400"
+              height="120"
+              rx="10"
+              fill="#151a26"
+              stroke="#a78bfa"
+            />
+            <text
+              x="70"
+              y="82"
+              fill="#a78bfa"
+              font-family="monospace"
+              font-size="12"
+            >
+              outer() scope — has "secret"
+            </text>
+            <rect
+              x="90"
+              y="100"
+              width="320"
+              height="60"
+              rx="10"
+              fill="#0b0e14"
+              stroke="#4ade80"
+            />
+            <text
+              x="110"
+              y="135"
+              fill="#4ade80"
+              font-family="monospace"
+              font-size="12"
+            >
+              inner() scope — can read "secret" ↑
+            </text>
+          </svg>
+        </div>
+
+        <h3 class="section-h">Try It</h3>
+        <div class="playground">
+          <div class="ph">Playground — edit and run</div>
+          <textarea id="pg2">
+function multiplyBy(factor) {
+  return function(n) {
+    return n * factor;
+  };
+}
+const double = multiplyBy(2);
+console.log(double(5));</textarea
+          >
+          <button onclick="runPG('pg2', 'out2')">▶ Run Code</button>
+          <div class="out" id="out2">// output appears here</div>
+        </div>
+
+        <div class="misconception">
+          <div class="tag">Common Misconception</div>
+          <p>
+            "Arrow functions are just shorter syntax for regular functions."
+            They're not interchangeable — an arrow function used as an object
+            method will not bind <code>this</code> to that object, a frequent
+            source of bugs.
+          </p>
+        </div>
+
+        <h3 class="section-h">Exercise</h3>
+        <div class="exercise">
+          <span class="ex-tag">Exercise 2.1</span>
+          <p>
+            Write a function <code>makeCounter()</code> that returns a function
+            which, each time it's called, returns the next integer starting from
+            0. Try it in the playground above by modifying the code.
+          </p>
+        </div>
+
+        <div class="takeaways">
+          <h3 class="section-h" style="margin-top: 0">Key Takeaways</h3>
+          <ul>
+            <li>
+              Function declarations are hoisted; expressions and arrows are not.
+            </li>
+            <li>
+              Scope is lexical — determined by where code is written, not
+              called.
+            </li>
+            <li>
+              Arrow functions inherit <code>this</code>; regular functions get
+              their own.
+            </li>
+            <li>
+              Inner functions can read outer variables, but not vice versa.
+            </li>
+          </ul>
+        </div>
+
+        <div class="quiz" id="quiz2">
+          <h3>Module 2 Quiz</h3>
+          <div class="quiz-sub">Answer all 4 questions to unlock Module 3.</div>
+          <div id="quiz2-body"></div>
+          <div class="quiz-actions">
+            <button
+              class="btn-primary"
+              id="quiz2-submit"
+              onclick="submitQuiz(2)"
+            >
+              Submit Answers
+            </button>
+            <button
+              class="btn-secondary"
+              id="quiz2-retry"
+              onclick="resetQuiz(2)"
+              style="display: none"
+            >
+              Retry Quiz
+            </button>
+          </div>
+          <div class="quiz-result" id="quiz2-result"></div>
+        </div>
+      </section>
+
+      <!-- ===================== MODULE 3 ===================== -->
+      <section class="module" id="mod3">
+        <div class="lock-note" id="lock3">
+          🔒 Complete Module 2 quiz to unlock
+        </div>
+        <div class="mod-head">
+          <span class="mod-num">03</span>
+          <span class="mod-title">Objects &amp; Arrays</span>
+          <span class="mod-tag">Practical Application</span>
+        </div>
+        <p class="mod-desc">
+          Real programs are built from structured data. This module covers
+          object literals, destructuring, array methods (<code>map</code>,
+          <code>filter</code>, <code>reduce</code>), and the spread operator —
+          the everyday toolkit of working JS.
+        </p>
+
+        <h3 class="section-h">Explanation</h3>
+        <div class="card">
+          <p>
+            <strong>Objects</strong> are key-value collections — the closest
+            thing JS has to a record or struct. <strong>Arrays</strong> are
+            ordered lists with powerful built-in iteration methods.
+            <code>map()</code> transforms each element into a new array;
+            <code>filter()</code> keeps elements matching a condition;
+            <code>reduce()</code> folds the array into a single value.
+          </p>
+          <p>
+            <strong>Destructuring</strong> unpacks values from objects/arrays
+            into variables in one line. The
+            <strong>spread operator</strong> (<code>...</code>) expands an
+            iterable — useful for copying arrays/objects without mutating the
+            original.
+          </p>
+        </div>
+
+        <pre class="code"><span class="c">// object + destructuring</span>
+<span class="k">const</span> student = { name: <span class="s">"Aarav"</span>, marks: [88, 92, 79] };
+<span class="k">const</span> { name, marks } = student;
+
+<span class="c">// array methods pipeline</span>
+<span class="k">const</span> avg = marks.reduce((sum, m) => sum + m, 0) / marks.length;
+<span class="k">const</span> passed = marks.filter(m => m >= 80);
+<span class="k">const</span> grades = marks.map(m => m >= 90 ? <span class="s">"A"</span> : <span class="s">"B"</span>);
+
+<span class="c">// spread — copy, don't mutate</span>
+<span class="k">const</span> updated = { ...student, marks: [...marks, 95] };</pre>
+
+        <div class="analogy">
+          <div class="tag">Analogy</div>
+          <p>
+            Think of <code>map</code>, <code>filter</code>, and
+            <code>reduce</code> as an assembly line: <code>map</code> is a
+            machine that reshapes every item passing through;
+            <code>filter</code> is a gate that only lets qualifying items pass;
+            <code>reduce</code> is a compactor that crushes the whole line into
+            one final result.
+          </p>
+        </div>
+
+        <h3 class="section-h">Comparison</h3>
+        <div class="compare">
+          <div class="col">
+            <h4>forEach</h4>
+            <ul>
+              <li>Just iterates, returns undefined</li>
+              <li>Used for side effects (logging, DOM updates)</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>map</h4>
+            <ul>
+              <li>Returns a brand-new array</li>
+              <li>Used to transform data, not for side effects</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="section-h">Data Pipeline Diagram</h3>
+        <div class="card">
+          <svg viewBox="0 0 600 100" style="width: 100%; height: auto">
+            <rect
+              x="0"
+              y="30"
+              width="120"
+              height="40"
+              rx="8"
+              fill="#1b2130"
+              stroke="#f0db4f"
+            />
+            <text
+              x="60"
+              y="55"
+              fill="#f0db4f"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              [79,88,92]
+            </text>
+            <path
+              d="M120 50 L 170 50"
+              stroke="#8b93a7"
+              stroke-width="2"
+              marker-end="url(#a2)"
+            />
+            <rect
+              x="170"
+              y="30"
+              width="110"
+              height="40"
+              rx="8"
+              fill="#1b2130"
+              stroke="#a78bfa"
+            />
+            <text
+              x="225"
+              y="55"
+              fill="#a78bfa"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              filter ≥80
+            </text>
+            <path
+              d="M280 50 L 330 50"
+              stroke="#8b93a7"
+              stroke-width="2"
+              marker-end="url(#a2)"
+            />
+            <rect
+              x="330"
+              y="30"
+              width="110"
+              height="40"
+              rx="8"
+              fill="#1b2130"
+              stroke="#4ade80"
+            />
+            <text
+              x="385"
+              y="55"
+              fill="#4ade80"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              reduce → avg
+            </text>
+            <path
+              d="M440 50 L 490 50"
+              stroke="#8b93a7"
+              stroke-width="2"
+              marker-end="url(#a2)"
+            />
+            <rect
+              x="490"
+              y="30"
+              width="100"
+              height="40"
+              rx="8"
+              fill="#1b2130"
+              stroke="#f87171"
+            />
+            <text
+              x="540"
+              y="55"
+              fill="#f87171"
+              font-family="monospace"
+              font-size="12"
+              text-anchor="middle"
+            >
+              86.5
+            </text>
+            <defs>
+              <marker
+                id="a2"
+                markerWidth="8"
+                markerHeight="8"
+                refX="6"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#8b93a7" />
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <h3 class="section-h">Try It</h3>
+        <div class="playground">
+          <div class="ph">Playground — edit and run</div>
+          <textarea id="pg3">
+const nums = [1,2,3,4,5,6];
+const evens = nums.filter(n => n % 2 === 0);
+const squared = evens.map(n => n * n);
+const total = squared.reduce((a,b) => a+b, 0);
+console.log(evens, squared, total);</textarea
+          >
+          <button onclick="runPG('pg3', 'out3')">▶ Run Code</button>
+          <div class="out" id="out3">// output appears here</div>
+        </div>
+
+        <div class="misconception">
+          <div class="tag">Common Misconception</div>
+          <p>
+            <code>array.sort()</code> sorts <em>alphabetically</em> by default,
+            even for numbers — <code>[10,1,2].sort()</code> gives
+            <code>[1,10,2]</code>. Always pass a comparator:
+            <code>.sort((a,b) => a-b)</code>.
+          </p>
+        </div>
+
+        <h3 class="section-h">Exercise</h3>
+        <div class="exercise">
+          <span class="ex-tag">Exercise 3.1</span>
+          <p>
+            Given <code>const prices = [199, 899, 49, 1200, 350]</code>, write
+            one chained expression using <code>filter</code> and
+            <code>reduce</code> that sums only the prices above 100. Test it in
+            the playground.
+          </p>
+        </div>
+
+        <div class="takeaways">
+          <h3 class="section-h" style="margin-top: 0">Key Takeaways</h3>
+          <ul>
+            <li>
+              Destructuring extracts values from objects/arrays into named
+              variables.
+            </li>
+            <li>
+              <code>map</code> transforms, <code>filter</code> selects,
+              <code>reduce</code> aggregates — and none of them mutate the
+              original array.
+            </li>
+            <li>
+              Spread (<code>...</code>) is the idiomatic way to copy/merge
+              without mutation.
+            </li>
+            <li>
+              <code>.sort()</code> needs a comparator for correct numeric
+              sorting.
+            </li>
+          </ul>
+        </div>
+
+        <div class="quiz" id="quiz3">
+          <h3>Module 3 Quiz</h3>
+          <div class="quiz-sub">Answer all 4 questions to unlock Module 4.</div>
+          <div id="quiz3-body"></div>
+          <div class="quiz-actions">
+            <button
+              class="btn-primary"
+              id="quiz3-submit"
+              onclick="submitQuiz(3)"
+            >
+              Submit Answers
+            </button>
+            <button
+              class="btn-secondary"
+              id="quiz3-retry"
+              onclick="resetQuiz(3)"
+              style="display: none"
+            >
+              Retry Quiz
+            </button>
+          </div>
+          <div class="quiz-result" id="quiz3-result"></div>
+        </div>
+      </section>
+
+      <!-- ===================== MODULE 4 ===================== -->
+      <section class="module" id="mod4">
+        <div class="lock-note" id="lock4">
+          🔒 Complete Module 3 quiz to unlock
+        </div>
+        <div class="mod-head">
+          <span class="mod-num">04</span>
+          <span class="mod-title">Closures &amp; the DOM</span>
+          <span class="mod-tag">Mastery</span>
+        </div>
+        <p class="mod-desc">
+          The capstone module: closures — the mechanism behind private state and
+          callbacks — and the DOM, where JS actually meets the page the user
+          sees.
+        </p>
+
+        <h3 class="section-h">Explanation</h3>
+        <div class="card">
+          <p>
+            A <strong>closure</strong> is a function bundled together with
+            references to its surrounding state. Even after the outer function
+            has finished running, the inner function keeps access to those
+            variables — this is how private counters, memoization, and module
+            patterns work in JS.
+          </p>
+          <p>
+            The <strong>DOM</strong> (Document Object Model) is the browser's
+            live tree representation of the page.
+            <code>document.querySelector</code> finds elements;
+            <code>addEventListener</code> reacts to user actions; changing
+            <code>element.textContent</code> or <code>.style</code> updates
+            what's rendered — all without reloading the page.
+          </p>
+        </div>
+
+        <pre class="code"><span class="c">// closure — private counter</span>
+<span class="k">function</span> createBankAccount(balance) {
+  <span class="k">return</span> {
+    deposit: (amt) => balance += amt,
+    getBalance: () => balance   <span class="c">// balance is "closed over" — private!</span>
+  };
+}
+<span class="k">const</span> acc = createBankAccount(1000);
+acc.deposit(500);
+<span class="k">console</span>.log(acc.getBalance()); <span class="c">// 1500 — no direct access to "balance"</span>
+
+<span class="c">// DOM interaction</span>
+<span class="k">document</span>.querySelector(<span class="s">"#btn"</span>).addEventListener(<span class="s">"click"</span>, () => {
+  <span class="k">document</span>.querySelector(<span class="s">"#label"</span>).textContent = <span class="s">"Clicked!"</span>;
+});</pre>
+
+        <div class="analogy">
+          <div class="tag">Analogy</div>
+          <p>
+            A closure is like a backpack a function carries with it wherever it
+            goes — packed with the variables from where it was born. Even if the
+            function travels far from its birthplace, it can still reach into
+            that backpack.
+          </p>
+        </div>
+
+        <h3 class="section-h">Comparison</h3>
+        <div class="compare">
+          <div class="col">
+            <h4>Global variable</h4>
+            <ul>
+              <li>Accessible &amp; mutable from anywhere</li>
+              <li>Easy to accidentally overwrite</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>Closure-based private state</h4>
+            <ul>
+              <li>Only accessible through exposed functions</li>
+              <li>Protected from outside interference</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="section-h">Live DOM Demo</h3>
+        <div class="card">
+          <p>
+            This counter below is powered by a real closure and real DOM event
+            handling — the exact pattern shown in the code above.
+          </p>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-top: 10px;
+            "
+          >
+            <button class="btn-primary" id="demoBtn" onclick="demoIncrement()">
+              Click me
+            </button>
+            <span style="font-family: var(--mono)"
+              >Count:
+              <span id="demoLabel" style="color: var(--yellow)">0</span></span
+            >
+          </div>
+        </div>
+
+        <h3 class="section-h">Try It</h3>
+        <div class="playground">
+          <div class="ph">Playground — edit and run</div>
+          <textarea id="pg4">
+function createBankAccount(balance) {
+  return {
+    deposit: (amt) => balance += amt,
+    getBalance: () => balance
+  };
+}
+const acc = createBankAccount(1000);
+acc.deposit(250);
+console.log(acc.getBalance());</textarea
+          >
+          <button onclick="runPG('pg4', 'out4')">▶ Run Code</button>
+          <div class="out" id="out4">// output appears here</div>
+        </div>
+
+        <div class="misconception">
+          <div class="tag">Common Misconception</div>
+          <p>
+            "Closures copy the variable's value at creation time." False — they
+            hold a live reference. This is why loops with <code>var</code> in
+            old code famously all log the same final value, while
+            <code>let</code> fixes it by creating a new binding per iteration.
+          </p>
+        </div>
+
+        <h3 class="section-h">Exercise</h3>
+        <div class="exercise">
+          <span class="ex-tag">Exercise 4.1</span>
+          <p>
+            Modify the playground code to add a
+            <code>withdraw(amt)</code> method to the bank account object that
+            decreases <code>balance</code>, and test that
+            <code>getBalance()</code> reflects it.
+          </p>
+        </div>
+
+        <div class="takeaways">
+          <h3 class="section-h" style="margin-top: 0">Key Takeaways</h3>
+          <ul>
+            <li>
+              Closures let inner functions retain access to outer variables
+              after the outer function returns.
+            </li>
+            <li>
+              Closures are the mechanism behind private state, memoization, and
+              the module pattern.
+            </li>
+            <li>
+              The DOM is queried with <code>querySelector</code> and reacted to
+              with <code>addEventListener</code>.
+            </li>
+            <li>
+              Closures capture live references, not snapshots — a classic source
+              of loop bugs with <code>var</code>.
+            </li>
+          </ul>
+        </div>
+
+        <div class="quiz" id="quiz4">
+          <h3>Module 4 Quiz</h3>
+          <div class="quiz-sub">
+            Answer all 4 questions to unlock the Final Challenge.
+          </div>
+          <div id="quiz4-body"></div>
+          <div class="quiz-actions">
+            <button
+              class="btn-primary"
+              id="quiz4-submit"
+              onclick="submitQuiz(4)"
+            >
+              Submit Answers
+            </button>
+            <button
+              class="btn-secondary"
+              id="quiz4-retry"
+              onclick="resetQuiz(4)"
+              style="display: none"
+            >
+              Retry Quiz
+            </button>
+          </div>
+          <div class="quiz-result" id="quiz4-result"></div>
+        </div>
+      </section>
+
+      <!-- ===================== FINAL SECTION ===================== -->
+      <section class="module final-section" id="final">
+        <div class="lock-note" id="lockFinal">
+          🔒 Complete Module 4 quiz to unlock
+        </div>
+        <div class="mod-head">
+          <span class="mod-title">🏁 Final Practical Challenge</span>
+        </div>
+        <div class="card">
+          <p>
+            <strong
+              >Build a "Student Grade Tracker" in your head (or a real
+              editor):</strong
+            >
+          </p>
+          <ul style="padding-left: 20px; color: #c9cedb">
+            <li>
+              Create an array of student objects:
+              <code>{ name, scores: [] }</code>
+            </li>
+            <li>
+              Write a closure-based <code>gradeBook()</code> that keeps a
+              private list and exposes <code>addStudent</code>,
+              <code>addScore</code>, and <code>getAverage</code>
+            </li>
+            <li>
+              Use <code>map</code>/<code>filter</code>/<code>reduce</code> to
+              compute the class average and list students who are passing
+              (average ≥ 60)
+            </li>
+            <li>
+              Render the results into the page using
+              <code>querySelector</code> and <code>textContent</code>
+            </li>
+          </ul>
+          <p style="margin-top: 10px; color: var(--muted)">
+            This combines every module: variables/types, functions/scope,
+            objects/arrays, and closures/DOM — the full toolkit.
+          </p>
+        </div>
+
+        <h3 class="section-h">Cheat Sheet</h3>
+        <div class="cheat-grid">
+          <div class="cheat-card">
+            <h4>Declaring</h4>
+            <pre>
+const x = 1;   // fixed
+let y = 2;     // reassignable</pre
+            >
+          </div>
+          <div class="cheat-card">
+            <h4>Functions</h4>
+            <pre>
+function f(a){return a}
+const f2 = (a) => a;</pre
+            >
+          </div>
+          <div class="cheat-card">
+            <h4>Array methods</h4>
+            <pre>
+arr.map(x => x*2)
+arr.filter(x => x>0)
+arr.reduce((a,b)=>a+b,0)</pre
+            >
+          </div>
+          <div class="cheat-card">
+            <h4>Destructuring</h4>
+            <pre>
+const {a,b} = obj;
+const [x,y] = arr;</pre
+            >
+          </div>
+          <div class="cheat-card">
+            <h4>Spread</h4>
+            <pre>
+const copy = {...obj};
+const merged = [...a, ...b];</pre
+            >
+          </div>
+          <div class="cheat-card">
+            <h4>DOM</h4>
+            <pre>
+document.querySelector('#id')
+el.addEventListener('click', fn)</pre
+            >
+          </div>
+        </div>
+
+        <h3 class="section-h">Summary Notes</h3>
+        <div class="card">
+          <p>
+            JavaScript's core mental model: values live in variables
+            (<code>let</code>/<code>const</code>), functions package behavior
+            and create scopes, objects/arrays structure data with a rich set of
+            non-mutating transformation methods, and closures let functions
+            remember the environment they were created in — which is also how
+            they eventually connect to and manipulate the live DOM.
+          </p>
+        </div>
+
+        <h3 class="section-h">Continue Learning</h3>
+        <div class="resource-grid">
+          <div class="resource-card">
+            <h4>📚 Books</h4>
+            <ul>
+              <li>"Eloquent JavaScript" — Marijn Haverbeke</li>
+              <li>"You Don't Know JS" series — Kyle Simpson</li>
+              <li>"JavaScript: The Definitive Guide" — David Flanagan</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>📖 Documentation</h4>
+            <ul>
+              <li>MDN Web Docs — developer.mozilla.org</li>
+              <li>javascript.info — structured modern JS guide</li>
+              <li>ECMA-262 Language Specification</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>🔬 Research &amp; Deep-Dives</h4>
+            <ul>
+              <li>
+                V8 blog — how closures &amp; the engine actually work internally
+              </li>
+              <li>TC39 proposals repository — the future of the language</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>👥 Communities</h4>
+            <ul>
+              <li>r/javascript, r/learnjavascript</li>
+              <li>Stack Overflow (javascript tag)</li>
+              <li>Dev.to and Hashnode JS communities</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>💻 Practice Platforms</h4>
+            <ul>
+              <li>freeCodeCamp — JS Algorithms &amp; Data Structures</li>
+              <li>Codewars, LeetCode (JS track)</li>
+              <li>JavaScript30 (Wes Bos, free)</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>🔎 Search Keywords</h4>
+            <div>
+              <span class="kw">js hoisting explained</span
+              ><span class="kw">closures interview questions</span>
+              <span class="kw">event loop javascript</span
+              ><span class="kw">map vs forEach</span>
+              <span class="kw">this keyword javascript</span>
+            </div>
+          </div>
+          <div class="resource-card">
+            <h4>🤖 AI Prompts to Go Deeper</h4>
+            <ul>
+              <li>
+                "Explain the JS event loop with a diagram of the call stack and
+                task queue"
+              </li>
+              <li>
+                "Quiz me on closures with 10 progressively harder questions"
+              </li>
+              <li>"Show me 5 real bugs caused by var vs let in loops"</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="certificate" id="certificate">
+          <div class="cert-title">🎓 Certificate of Completion</div>
+          <p>
+            You've completed <strong>JavaScript Fundamentals</strong> with a
+            quiz average of <span id="certScore">0%</span>.
+          </p>
+          <p style="color: var(--muted); font-size: 0.85rem; margin-top: 6px">
+            Interactive Learning Studio · Generated for your learning record
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <button class="print-btn" onclick="window.print()">
+      🖨 Print / Save Notes
+    </button>
+
+    <script>
+      /* ---------------- typing console ---------------- */
+      const consoleLines = [
+        'const skill = "JavaScript";',
+        "learn(skill).then(build);",
+        "// let's begin →",
+      ];
+      let ctIndex = 0,
+        ctChar = 0;
+      function typeConsole() {
+        const el = document.getElementById("consoleText");
+        if (ctIndex >= consoleLines.length) {
+          setTimeout(() => {
+            el.textContent = "";
+            ctIndex = 0;
+            ctChar = 0;
+            typeConsole();
+          }, 1800);
+          return;
+        }
+        const line = consoleLines[ctIndex];
+        if (ctChar <= line.length) {
+          el.textContent =
+            consoleLines.slice(0, ctIndex).join("\\n") +
+            (ctIndex > 0 ? "\\n" : "") +
+            line.slice(0, ctChar);
+          ctChar++;
+          setTimeout(typeConsole, 35);
+        } else {
+          ctIndex++;
+          ctChar = 0;
+          setTimeout(typeConsole, 500);
+        }
+      }
+      typeConsole();
+
+      /* ---------------- rail nav ---------------- */
+      document.querySelectorAll(".rail .step").forEach((s) => {
+        s.addEventListener("click", () => {
+          const t = document.getElementById(s.dataset.target);
+          if (t) t.scrollIntoView({ behavior: "smooth" });
+        });
+      });
+      const railSteps = {
+        intro: 0,
+        mod1: 1,
+        mod2: 2,
+        mod3: 3,
+        mod4: 4,
+        final: 5,
+      };
+      function updateRailActive(id) {
+        document
+          .querySelectorAll(".rail .step")
+          .forEach((s) => s.classList.remove("active"));
+        const el = document.querySelector(`.rail .step[data-target="${id}"]`);
+        if (el) el.classList.add("active");
+      }
+      const sectionIds = ["intro", "mod1", "mod2", "mod3", "mod4", "final"];
+      function getRailOffset() {
+        const rail = document.getElementById("rail");
+        return (rail ? rail.offsetHeight : 0) + 40;
+      }
+      function onScrollHighlight() {
+        const markerY = getRailOffset();
+        let currentId = sectionIds[0];
+        for (const id of sectionIds) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= markerY) {
+            currentId = id;
+          }
+        }
+        updateRailActive(currentId);
+      }
+      window.addEventListener("scroll", onScrollHighlight, { passive: true });
+      window.addEventListener("resize", onScrollHighlight);
+      onScrollHighlight();
+
+      /* ---------------- progress bar + XP ---------------- */
+      let xp = 0,
+        quizScores = {};
+      function updateProgress() {
+        const done = document.querySelectorAll(".rail .step.done").length;
+        document.getElementById("progressBar").style.width =
+          (done / 5) * 100 + "%";
+        document.getElementById("xpDisplay").textContent = xp;
+        const scores = Object.values(quizScores);
+        const rate = scores.length
+          ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+          : 0;
+        document.getElementById("passRate").textContent = rate + "%";
+      }
+
+      /* ---------------- playground runner ---------------- */
+      function runPG(taId, outId) {
+        const code = document.getElementById(taId).value;
+        const outEl = document.getElementById(outId);
+        const logs = [];
+        const fakeConsole = {
+          log: (...args) =>
+            logs.push(
+              args
+                .map((a) =>
+                  typeof a === "object" ? JSON.stringify(a) : String(a),
+                )
+                .join(" "),
+            ),
+        };
+        try {
+          const fn = new Function("console", code);
+          fn(fakeConsole);
+          outEl.textContent = logs.length ? logs.join("\\n") : "// no output";
+          outEl.style.color = "var(--green)";
+        } catch (err) {
+          outEl.textContent = "⚠ " + err.message;
+          outEl.style.color = "var(--red)";
+        }
+      }
+
+      /* ---------------- DOM demo (closure) ---------------- */
+      function makeCounter() {
+        let c = 0;
+        return () => ++c;
+      }
+      const demoCounter = makeCounter();
+      function demoIncrement() {
+        document.getElementById("demoLabel").textContent = demoCounter();
+      }
+
+      /* ---------------- quiz data ---------------- */
+      const QUIZZES = {
+        1: [
+          {
+            q: "What does `typeof null` return in JavaScript?",
+            opts: ['"null"', '"object"', '"undefined"', '"boolean"'],
+            correct: 1,
+            explain:
+              'A long-standing bug in JS: `typeof null` returns "object", kept for backward compatibility despite null being a primitive.',
+          },
+          {
+            q: "Which declaration should you avoid in modern JS?",
+            opts: ["const", "let", "var", "Both let and const"],
+            correct: 2,
+            explain:
+              "`var` is function-scoped and hoists in confusing ways; `let`/`const` are block-scoped and safer.",
+          },
+          {
+            q: 'What is the result of `"5" + 3` in JavaScript?',
+            opts: ["8", '"53"', "NaN", "Error"],
+            correct: 1,
+            explain:
+              'The `+` operator coerces the number to a string when either operand is a string, producing concatenation: "53".',
+          },
+          {
+            q: "Can you mutate the contents of a `const` array?",
+            opts: [
+              "No, never",
+              "Yes, only reassignment is blocked",
+              "Only with let",
+              "Only in strict mode",
+            ],
+            correct: 1,
+            explain:
+              "`const` prevents reassigning the variable itself, but the array/object it points to can still be mutated (e.g. via push).",
+          },
+        ],
+        2: [
+          {
+            q: "Which function type is hoisted and usable before its definition?",
+            opts: [
+              "Arrow function",
+              "Function expression",
+              "Function declaration",
+              "All of the above",
+            ],
+            correct: 2,
+            explain:
+              "Function declarations are hoisted fully (name + body); expressions and arrows are not.",
+          },
+          {
+            q: "What determines a variable's scope in JavaScript?",
+            opts: [
+              "Where the function is called",
+              "Where the code is written (lexical scope)",
+              "The order functions run in",
+              "Random assignment",
+            ],
+            correct: 1,
+            explain:
+              "JS uses lexical (static) scoping — access is determined by where code is physically written, not where it executes.",
+          },
+          {
+            q: "How do arrow functions handle `this`?",
+            opts: [
+              "They get their own `this`",
+              "They inherit `this` from the enclosing scope",
+              "They always set `this` to undefined",
+              "They set `this` to the global object",
+            ],
+            correct: 1,
+            explain:
+              "Arrow functions do not bind their own `this` — they inherit it lexically from where they were defined.",
+          },
+          {
+            q: "In the scope-chain diagram, can the Global scope read variables declared inside `inner()`?",
+            opts: [
+              "Yes, always",
+              "No — inner scopes are invisible to outer scopes",
+              "Only if declared with var",
+              "Only in strict mode",
+            ],
+            correct: 1,
+            explain:
+              "Scope visibility only flows inward-to-outward for reading; outer scopes cannot see variables declared in inner ones.",
+          },
+        ],
+        3: [
+          {
+            q: "Which array method returns a brand-new transformed array?",
+            opts: ["forEach", "map", "sort (default)", "push"],
+            correct: 1,
+            explain:
+              "`map()` returns a new array by transforming every element; `forEach` returns undefined and is used for side effects.",
+          },
+          {
+            q: "What does `array.filter(fn)` do?",
+            opts: [
+              "Mutates the array in place",
+              "Returns a new array with only matching elements",
+              "Returns a single combined value",
+              "Sorts the array",
+            ],
+            correct: 1,
+            explain:
+              "`filter` builds a new array containing only elements for which the callback returns true.",
+          },
+          {
+            q: "Why is `[10,1,2].sort()` misleading?",
+            opts: [
+              "sort() does not exist",
+              "It sorts alphabetically by default, not numerically",
+              "It throws an error",
+              "It sorts descending by default",
+            ],
+            correct: 1,
+            explain:
+              'Without a comparator, `.sort()` converts elements to strings and sorts lexicographically — "10" comes before "2".',
+          },
+          {
+            q: "What is the purpose of the spread operator `...` here: `{...student, marks: [...marks, 95]}`?",
+            opts: [
+              "Deletes the original object",
+              "Creates a new object/array without mutating the originals",
+              "Loops over the object",
+              "Converts object to array",
+            ],
+            correct: 1,
+            explain:
+              "Spread copies existing properties/elements into a new object/array, which is the idiomatic non-mutating update pattern.",
+          },
+        ],
+        4: [
+          {
+            q: "What is a closure?",
+            opts: [
+              "A function with no parameters",
+              "A function bundled with references to its surrounding state",
+              "A way to end a loop",
+              "A type of array method",
+            ],
+            correct: 1,
+            explain:
+              "A closure is a function plus the lexical environment it was created in, letting it keep accessing outer variables later.",
+          },
+          {
+            q: "In the bank account example, why can't external code directly modify `balance`?",
+            opts: [
+              "balance is declared with const",
+              "balance is only accessible via the closure's returned methods",
+              "JavaScript blocks all object mutation",
+              "balance is a global variable",
+            ],
+            correct: 1,
+            explain:
+              "`balance` is a local variable of `createBankAccount`; only the closures (deposit/getBalance) that were created alongside it can reach it.",
+          },
+          {
+            q: "What does `document.querySelector` do?",
+            opts: [
+              "Creates a new HTML element",
+              "Finds and returns the first matching element in the DOM",
+              "Deletes an element",
+              "Adds CSS to an element",
+            ],
+            correct: 1,
+            explain:
+              "`querySelector` searches the DOM tree using a CSS selector and returns the first matching element.",
+          },
+          {
+            q: 'Why do closures capture "live references" rather than snapshots?',
+            opts: [
+              "They don't — they always snapshot values",
+              "Because they hold a reference to the actual variable binding, which can change",
+              "Because of garbage collection",
+              "Because of the DOM",
+            ],
+            correct: 1,
+            explain:
+              "Closures reference the actual variable binding in memory, so if that variable changes later, the closure sees the updated value — this is the classic var-in-a-loop gotcha.",
+          },
+        ],
+      };
+
+      function buildQuiz(modNum) {
+        const container = document.getElementById("quiz" + modNum + "-body");
+        container.innerHTML = "";
+        QUIZZES[modNum].forEach((q, qi) => {
+          const card = document.createElement("div");
+          card.className = "qcard";
+          card.dataset.qi = qi;
+          const qt = document.createElement("div");
+          qt.className = "qtext";
+          qt.textContent = qi + 1 + ". " + q.q;
+          card.appendChild(qt);
+          const opts = document.createElement("div");
+          opts.className = "qopts";
+          q.opts.forEach((optText, oi) => {
+            const opt = document.createElement("div");
+            opt.className = "qopt";
+            opt.textContent = optText;
+            opt.dataset.oi = oi;
+            opt.addEventListener("click", () => {
+              if (card.classList.contains("locked")) return;
+              opts
+                .querySelectorAll(".qopt")
+                .forEach((o) => o.classList.remove("selected"));
+              opt.classList.add("selected");
+            });
+            opts.appendChild(opt);
+          });
+          card.appendChild(opts);
+          const ex = document.createElement("div");
+          ex.className = "qexplain";
+          ex.textContent = "💡 " + q.explain;
+          card.appendChild(ex);
+          container.appendChild(card);
+        });
+      }
+      [1, 2, 3, 4].forEach(buildQuiz);
+
+      function submitQuiz(modNum) {
+        const cards = document.querySelectorAll(
+          "#quiz" + modNum + "-body .qcard",
+        );
+        let selectedCount = 0,
+          correctCount = 0;
+        cards.forEach((card, qi) => {
+          const selected = card.querySelector(".qopt.selected");
+          const q = QUIZZES[modNum][qi];
+          if (selected) {
+            selectedCount++;
+            const oi = parseInt(selected.dataset.oi);
+            card
+              .querySelectorAll(".qopt")
+              .forEach((o) => (o.style.pointerEvents = "none"));
+            if (oi === q.correct) {
+              selected.classList.add("correct");
+              correctCount++;
+            } else {
+              selected.classList.add("incorrect");
+              card
+                .querySelector(`.qopt[data-oi="${q.correct}"]`)
+                .classList.add("correct");
+            }
+          } else {
+            card
+              .querySelectorAll(".qopt")
+              .forEach((o) => (o.style.pointerEvents = "none"));
+            card
+              .querySelector(`.qopt[data-oi="${q.correct}"]`)
+              .classList.add("correct");
+          }
+          card.querySelector(".qexplain").classList.add("show");
+          card.classList.add("locked");
+        });
+
+        const scorePct = Math.round((correctCount / 4) * 100);
+        quizScores[modNum] = scorePct;
+        const resultEl = document.getElementById("quiz" + modNum + "-result");
+        resultEl.classList.add("show");
+        document.getElementById("quiz" + modNum + "-submit").style.display =
+          "none";
+        document.getElementById("quiz" + modNum + "-retry").style.display =
+          "inline-block";
+
+        if (correctCount >= 3) {
+          resultEl.className = "quiz-result show pass";
+          resultEl.textContent = `✅ ${correctCount}/4 correct (${scorePct}%) — Module passed! Next module unlocked.`;
+          xp += correctCount * 25;
+          unlockNext(modNum);
+          markRailDone(modNum);
+        } else {
+          resultEl.className = "quiz-result show retry";
+          resultEl.textContent = `⚠ ${correctCount}/4 correct (${scorePct}%) — Score 3/4 or higher to unlock the next module. Try again!`;
+          xp += correctCount * 10;
+        }
+        updateProgress();
+      }
+
+      function resetQuiz(modNum) {
+        buildQuiz(modNum);
+        document.getElementById("quiz" + modNum + "-submit").style.display =
+          "inline-block";
+        document.getElementById("quiz" + modNum + "-retry").style.display =
+          "none";
+        const resultEl = document.getElementById("quiz" + modNum + "-result");
+        resultEl.classList.remove("show");
+      }
+
+      function unlockNext(modNum) {
+        const map = { 1: "mod2", 2: "mod3", 3: "mod4", 4: "final" };
+        const nextId = map[modNum];
+        const nextEl = document.getElementById(nextId);
+        if (nextEl) {
+          nextEl.classList.add("unlocked");
+          const lockNote = document.getElementById(
+            "lock" + (nextId === "final" ? "Final" : nextId.replace("mod", "")),
+          );
+          if (lockNote) lockNote.style.display = "none";
+        }
+        if (modNum === 4) {
+          const scores = Object.values(quizScores);
+          const avg = Math.round(
+            scores.reduce((a, b) => a + b, 0) / scores.length,
+          );
+          document.getElementById("certScore").textContent = avg + "%";
+          document.getElementById("certificate").classList.add("show");
+        }
+      }
+
+      function markRailDone(modNum) {
+        const map = { 1: "mod1", 2: "mod2", 3: "mod3", 4: "mod4" };
+        const stepEl = document.querySelector(
+          `.rail .step[data-target="${map[modNum]}"]`,
+        );
+        if (stepEl) {
+          stepEl.classList.add("done");
+          stepEl.querySelector(".chk").textContent = "✓";
+        }
+        if (modNum === 4) {
+          const finalStep = document.querySelector(
+            '.rail .step[data-target="final"]',
+          );
+          if (finalStep) {
+            finalStep.classList.add("done");
+            finalStep.querySelector(".chk").textContent = "✓";
+          }
+        }
+      }
+
+      updateProgress();
+    </script>
+  </body>
+</html>
