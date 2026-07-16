@@ -1,0 +1,1625 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autonomous Agent Studio — Code Generation Pipeline</title>
+    <style>
+      :root {
+        --bg: #0a0e13;
+        --bg-alt: #0d1319;
+        --panel: #121a22;
+        --panel-2: #0f161d;
+        --line: #1e2a35;
+        --line-soft: #182029;
+        --text: #e7edf3;
+        --muted: #7d93a6;
+        --muted-2: #546575;
+        --amber: #f2a65a;
+        --amber-dim: #8a6338;
+        --cyan: #5ad1c9;
+        --cyan-dim: #2f5f5b;
+        --success: #6bcb77;
+        --danger: #e36464;
+        --mono:
+          ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono",
+          monospace;
+        --sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background:
+          radial-gradient(
+            circle at 15% 0%,
+            rgba(90, 209, 201, 0.06),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 85% 10%,
+            rgba(242, 166, 90, 0.05),
+            transparent 40%
+          ),
+          var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        min-height: 100vh;
+        line-height: 1.5;
+      }
+      ::selection {
+        background: rgba(90, 209, 201, 0.3);
+      }
+      a {
+        color: var(--cyan);
+      }
+      .wrap {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 20px 80px;
+      }
+
+      /* ===== Header ===== */
+      header.top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--line-soft);
+        padding-bottom: 22px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .brand .mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--cyan-dim), var(--amber-dim));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .brand .mark svg {
+        width: 24px;
+        height: 24px;
+      }
+      .brand h1 {
+        font-size: 19px;
+        margin: 0;
+        letter-spacing: 0.2px;
+        font-weight: 650;
+      }
+      .brand .sub {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 3px;
+        letter-spacing: 0.3px;
+      }
+      .status-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 8px 14px;
+        border-radius: 100px;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--muted-2);
+        transition: background 0.3s;
+      }
+      .status-dot.running {
+        background: var(--amber);
+        box-shadow: 0 0 0 0 rgba(242, 166, 90, 0.6);
+        animation: pulse-dot 1.4s infinite;
+      }
+      .status-dot.done {
+        background: var(--success);
+      }
+      .status-dot.error {
+        background: var(--danger);
+      }
+      @keyframes pulse-dot {
+        0% {
+          box-shadow: 0 0 0 0 rgba(242, 166, 90, 0.55);
+        }
+        70% {
+          box-shadow: 0 0 0 8px rgba(242, 166, 90, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(242, 166, 90, 0);
+        }
+      }
+
+      /* ===== Setup panel ===== */
+      .setup {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 26px;
+      }
+      .setup h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+      .setup .hint {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 760px) {
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      label.field-label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-family: var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+      textarea,
+      input[type="text"],
+      select {
+        width: 100%;
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 11px 12px;
+        font-family: var(--sans);
+        font-size: 14px;
+        resize: vertical;
+        transition: border-color 0.15s;
+      }
+      textarea:focus,
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--cyan-dim);
+      }
+      textarea {
+        min-height: 92px;
+      }
+      .row-inline {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .row-inline > div {
+        flex: 1;
+        min-width: 160px;
+      }
+      .btn {
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        padding: 12px 22px;
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          filter 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--cyan), #4bb8b0);
+        color: #04211e;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.08);
+      }
+      .btn-primary:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        filter: none;
+      }
+      .btn-ghost {
+        background: transparent;
+        border-color: var(--line);
+        color: var(--muted);
+      }
+      .btn-ghost:hover {
+        color: var(--text);
+        border-color: var(--muted-2);
+      }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* ===== Workflow diagram ===== */
+      .diagram-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 26px;
+      }
+      .diagram-card h2 {
+        margin: 0 0 2px;
+        font-size: 15px;
+      }
+      .diagram-card .hint {
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-bottom: 10px;
+      }
+      #diagram-svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .node-box {
+        fill: var(--panel-2);
+        stroke: var(--line);
+        stroke-width: 1.5;
+        transition:
+          stroke 0.25s,
+          fill 0.25s;
+      }
+      .node-box.active {
+        stroke: var(--amber);
+        fill: #1a1610;
+      }
+      .node-box.done {
+        stroke: var(--cyan-dim);
+      }
+      .node-label {
+        fill: var(--text);
+        font-family: var(--mono);
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .node-sub {
+        fill: var(--muted);
+        font-family: var(--mono);
+        font-size: 9px;
+      }
+      .flow-line {
+        stroke: var(--line);
+        stroke-width: 1.6;
+        fill: none;
+      }
+      .flow-line.loop {
+        stroke: var(--cyan-dim);
+        stroke-dasharray: 5 4;
+      }
+      .flow-line.branch {
+        stroke: var(--amber-dim);
+        stroke-dasharray: 3 3;
+      }
+      .pulse-dot-anim {
+        fill: var(--amber);
+        filter: drop-shadow(0 0 4px var(--amber));
+      }
+
+      /* ===== Console / log ===== */
+      .panels {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 20px;
+        align-items: start;
+      }
+      @media (max-width: 920px) {
+        .panels {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .card h3 {
+        margin: 0 0 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card h3 .tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        padding: 2px 7px;
+        border-radius: 5px;
+      }
+
+      .log {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 12px 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.65;
+        max-height: 230px;
+        overflow-y: auto;
+        color: var(--muted);
+      }
+      .log .l-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 2px;
+      }
+      .log .l-time {
+        color: var(--muted-2);
+        flex-shrink: 0;
+      }
+      .log .l-tag {
+        flex-shrink: 0;
+      }
+      .log .tag-plan {
+        color: var(--cyan);
+      }
+      .log .tag-exec {
+        color: var(--amber);
+      }
+      .log .tag-eval {
+        color: #c48ef2;
+      }
+      .log .tag-crit {
+        color: #f28ea0;
+      }
+      .log .tag-improve {
+        color: var(--success);
+      }
+      .log .tag-final {
+        color: #f2e35a;
+      }
+      .log .tag-sys {
+        color: var(--muted-2);
+      }
+      .log .tag-err {
+        color: var(--danger);
+      }
+
+      pre.code-block {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: #d7e2ea;
+        max-height: 420px;
+        overflow-y: auto;
+      }
+      .empty-note {
+        color: var(--muted-2);
+        font-family: var(--mono);
+        font-size: 12.5px;
+        font-style: italic;
+      }
+
+      /* ===== history table ===== */
+      table.hist {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      table.hist th {
+        text-align: left;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.hist td {
+        padding: 8px 8px;
+        border-bottom: 1px solid var(--line-soft);
+        font-family: var(--mono);
+        font-size: 12.5px;
+      }
+      table.hist tr:last-child td {
+        border-bottom: none;
+      }
+      .score-bar-wrap {
+        background: var(--panel-2);
+        border-radius: 4px;
+        height: 6px;
+        width: 80px;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+      .score-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--cyan), var(--success));
+      }
+      .delta-up {
+        color: var(--success);
+      }
+      .delta-flat {
+        color: var(--muted);
+      }
+      .delta-down {
+        color: var(--danger);
+      }
+
+      .stop-banner {
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-family: var(--mono);
+        font-size: 13px;
+        border: 1px solid var(--line);
+        margin-top: 14px;
+        display: none;
+      }
+      .stop-banner.show {
+        display: block;
+      }
+      .stop-banner.threshold {
+        background: rgba(107, 203, 119, 0.08);
+        border-color: rgba(107, 203, 119, 0.35);
+        color: var(--success);
+      }
+      .stop-banner.plateau {
+        background: rgba(90, 209, 201, 0.08);
+        border-color: rgba(90, 209, 201, 0.35);
+        color: var(--cyan);
+      }
+      .stop-banner.cap {
+        background: rgba(242, 166, 90, 0.08);
+        border-color: rgba(242, 166, 90, 0.35);
+        color: var(--amber);
+      }
+
+      .round-indicator {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--amber);
+        background: rgba(242, 166, 90, 0.08);
+        border: 1px solid var(--amber-dim);
+        padding: 8px 14px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .round-indicator .spin {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        border: 2px solid var(--amber-dim);
+        border-top-color: var(--amber);
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .agent-desc {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .agent-desc b {
+        color: var(--text);
+      }
+      .agent-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .agent-card {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 12px 14px;
+      }
+      .agent-card .a-name {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .agent-card .a-role {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .final-summary {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 18px;
+        margin-top: 10px;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin: 14px 0;
+      }
+      .stat-box {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 12px;
+        text-align: center;
+      }
+      .stat-box .num {
+        font-family: var(--mono);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--cyan);
+      }
+      .stat-box .lab {
+        font-size: 10.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+
+      .foot-section {
+        margin-top: 40px;
+        border-top: 1px solid var(--line-soft);
+        padding-top: 26px;
+      }
+      .foot-section h2 {
+        font-size: 17px;
+        margin: 0 0 14px;
+      }
+      .extension-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+      .extension-list li {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 13px 15px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .extension-list li b {
+        color: var(--text);
+        display: block;
+        margin-bottom: 3px;
+        font-size: 13.5px;
+      }
+      .prompt-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .prompt-item {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+      .prompt-item:hover {
+        border-color: var(--cyan-dim);
+        color: var(--text);
+      }
+      .prompt-item span.copy-hint {
+        font-size: 10px;
+        color: var(--muted-2);
+        flex-shrink: 0;
+      }
+
+      .retry-note {
+        color: var(--danger);
+        font-family: var(--mono);
+        font-size: 11.5px;
+        margin-top: 4px;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .scrollbar-hide::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 4px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <div class="mark">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--cyan)"
+              stroke-width="1.6"
+            >
+              <path
+                d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"
+                stroke-linecap="round"
+              />
+              <circle cx="12" cy="12" r="3.2" stroke="var(--amber)" />
+            </svg>
+          </div>
+          <div>
+            <h1>Autonomous Agent Studio</h1>
+            <div class="sub">
+              multi-agent code generation &amp; self-improvement pipeline
+            </div>
+          </div>
+        </div>
+        <div class="status-chip">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Idle — awaiting spec</span>
+        </div>
+      </header>
+
+      <!-- SETUP -->
+      <section class="setup" id="setup-panel">
+        <h2>Define the build spec</h2>
+        <div class="hint">
+          The pipeline auto-designed itself for:
+          <b style="color: var(--text)"
+            >code generation from a spec, any language, optimized for quality
+            (readability &amp; best practices), stopping at a plateau or quality
+            threshold — whichever comes first.</b
+          >
+        </div>
+
+        <label class="field-label">What should the code do?</label>
+        <textarea
+          id="spec-input"
+          placeholder="e.g. Write a function that validates and normalizes international phone numbers, returning a structured result with country code, national number, and validity flag."
+        >
+Write a function that takes a list of overlapping time intervals (start, end) and merges them into the minimal set of non-overlapping intervals, sorted by start time. Handle edge cases: empty input, single interval, fully nested intervals, and touching-but-not-overlapping intervals.</textarea
+        >
+
+        <div class="row-inline" style="margin-top: 14px">
+          <div>
+            <label class="field-label">Target language</label>
+            <select id="lang-select">
+              <option value="Python">Python</option>
+              <option value="JavaScript">JavaScript</option>
+              <option value="TypeScript">TypeScript</option>
+              <option value="Java">Java</option>
+              <option value="Go">Go</option>
+              <option value="Rust">Rust</option>
+              <option value="C++">C++</option>
+              <option value="other">Other (type below)</option>
+            </select>
+            <input
+              type="text"
+              id="lang-other"
+              placeholder="e.g. Kotlin"
+              style="margin-top: 8px; display: none"
+            />
+          </div>
+          <div>
+            <label class="field-label">Quality target score (1–10)</label>
+            <input type="text" id="threshold-input" value="9.0" />
+          </div>
+          <div>
+            <label class="field-label"
+              >Plateau delta (min improvement to keep going)</label
+            >
+            <input type="text" id="delta-input" value="0.3" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="run-btn">▶ Run pipeline</button>
+          <button class="btn btn-ghost" id="reset-btn" style="display: none">
+            ↺ Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- DIAGRAM -->
+      <section class="diagram-card">
+        <h2>Pipeline architecture</h2>
+        <div class="hint">
+          A real cycle: Evaluator → Critic → Improver loops back into Evaluator
+          each round. Once a stop condition fires, flow branches to the Final
+          Reviewer instead of looping again.
+        </div>
+        <svg
+          id="diagram-svg"
+          viewBox="0 0 1000 300"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- static flow lines drawn dynamically in JS for positioning control -->
+        </svg>
+        <div class="agent-grid" id="agent-explainers"></div>
+      </section>
+
+      <div class="round-indicator" id="round-indicator" style="display: none">
+        <span class="spin"></span>
+        <span id="round-indicator-text">Round 1 — planning...</span>
+      </div>
+
+      <!-- MAIN PANELS -->
+      <div class="panels">
+        <div>
+          <div class="card">
+            <h3>
+              Intermediate outputs
+              <span class="tag" id="active-agent-tag">idle</span>
+            </h3>
+            <div
+              id="output-tabs"
+              style="
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+              "
+            ></div>
+            <div id="output-content">
+              <div class="empty-note">
+                No output yet. Run the pipeline to see live agent outputs here.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Round-by-round history</h3>
+            <div id="history-wrap">
+              <div class="empty-note">
+                History will populate once evaluation rounds begin.
+              </div>
+            </div>
+            <div class="stop-banner" id="stop-banner"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Activity log</h3>
+            <div class="log scrollbar-hide" id="activity-log">
+              <div class="l-row">
+                <span class="l-time">--:--:--</span
+                ><span class="l-tag tag-sys">[system]</span
+                ><span>Waiting to start...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Memory &amp; state</h3>
+            <div id="memory-panel" class="empty-note">
+              No memory entries yet.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL SUMMARY -->
+      <section class="card" id="final-summary-card" style="display: none">
+        <h3>Final summary</h3>
+        <div class="final-summary" id="final-summary-content"></div>
+      </section>
+
+      <!-- FOOTER / EDUCATIONAL -->
+      <div class="foot-section">
+        <h2>How the stop-check governs the loop</h2>
+        <p class="agent-desc">
+          Every round the pipeline calls the <b>Evaluator</b> fresh against the
+          current draft, then the <b>Critic</b> for qualitative issues, then the
+          <b>Improver</b> to produce the next draft — each a live API call,
+          never a canned template. After each Evaluator call, three checks run
+          in strict order: <b>(1) plateau</b> — has the score improved by less
+          than the configured delta for two consecutive rounds?
+          <b>(2) threshold</b> — has the score crossed the target set at
+          interview? <b>(3) hard cap</b> — a safety fallback (12 rounds) so the
+          loop can never run forever. Whichever fires first ends the loop and
+          hands the running history to the <b>Final Reviewer</b>, which never
+          edits code itself — it only synthesizes what happened.
+        </p>
+
+        <h2 style="margin-top: 26px">Extension ideas</h2>
+        <ul class="extension-list">
+          <li>
+            <b>Safety Monitor agent</b>Add a dedicated pass that screens
+            generated code for unsafe patterns (eval, shell injection, unbounded
+            recursion) before it ever reaches the Evaluator.
+          </li>
+          <li>
+            <b>Memory Manager agent</b>Persist distilled lessons ("avoid mutable
+            default args", "prefer early returns") across separate runs, not
+            just within one run's history.
+          </li>
+          <li>
+            <b>Multi-file scope</b>Extend the Executor to plan and generate
+            across multiple files/modules with a dependency graph instead of a
+            single function.
+          </li>
+          <li>
+            <b>Test-driven loop</b>Have the Executor also generate unit tests,
+            and let the Evaluator run them (via a sandboxed tool call) as part
+            of the score.
+          </li>
+          <li>
+            <b>Human-in-the-loop gate</b>Insert an approval checkpoint before
+            the Final Reviewer commits, so a person can veto or redirect a
+            round.
+          </li>
+          <li>
+            <b>Parallel drafts</b>Run 2–3 Executors in parallel per round and
+            let the Evaluator pick the strongest draft to improve further.
+          </li>
+        </ul>
+
+        <h2 style="margin-top: 26px">
+          Prompts to build more advanced autonomous systems
+        </h2>
+        <div class="prompt-list" id="prompt-list"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ---------------- Config / State ---------------- */
+        const API_URL = "https://api.anthropic.com/v1/messages";
+        const MODEL = "claude-sonnet-4-6";
+        const HARD_CAP = 12;
+
+        const state = {
+          running: false,
+          spec: "",
+          language: "Python",
+          threshold: 9.0,
+          delta: 0.3,
+          plan: "",
+          draft: "",
+          history: [], // {round, score, critique, draftSnippet, delta, fullDraft, evalRaw}
+          memory: [],
+          stopReason: null,
+          retries: 0,
+          activeAgent: null,
+        };
+
+        const AGENTS = {
+          planner: {
+            name: "Planner",
+            tag: "tag-plan",
+            color: "var(--cyan)",
+            role: "Breaks the spec into requirements, edge cases, and an implementation approach before any code is written.",
+          },
+          executor: {
+            name: "Executor",
+            tag: "tag-exec",
+            color: "var(--amber)",
+            role: "Writes the first working draft of the code strictly following the Planner's approach.",
+          },
+          evaluator: {
+            name: "Evaluator",
+            tag: "tag-eval",
+            color: "#c48ef2",
+            role: "Scores the current draft 1–10 against a quality rubric (readability, naming, structure, best practices, docs, edge-case handling) every single round.",
+          },
+          critic: {
+            name: "Critic",
+            tag: "tag-crit",
+            color: "#f28ea0",
+            role: "Reads the Evaluator's score and writes specific, actionable critique the Improver must address.",
+          },
+          improver: {
+            name: "Improver",
+            tag: "tag-improve",
+            color: "var(--success)",
+            role: "Rewrites the draft using the prior evaluation + critique, threading forward everything learned so far.",
+          },
+          final: {
+            name: "Final Reviewer",
+            tag: "tag-final",
+            color: "#f2e35a",
+            role: "Only runs once a stop condition fires. Synthesizes the run into a final verdict — never edits code.",
+          },
+        };
+
+        /* ---------------- DOM refs ---------------- */
+        const $ = (id) => document.getElementById(id);
+        const specInput = $("spec-input");
+        const langSelect = $("lang-select");
+        const langOther = $("lang-other");
+        const thresholdInput = $("threshold-input");
+        const deltaInput = $("delta-input");
+        const runBtn = $("run-btn");
+        const resetBtn = $("reset-btn");
+        const statusDot = $("status-dot");
+        const statusText = $("status-text");
+        const activityLog = $("activity-log");
+        const historyWrap = $("history-wrap");
+        const stopBanner = $("stop-banner");
+        const roundIndicator = $("round-indicator");
+        const roundIndicatorText = $("round-indicator-text");
+        const outputTabs = $("output-tabs");
+        const outputContent = $("output-content");
+        const activeAgentTag = $("active-agent-tag");
+        const memoryPanel = $("memory-panel");
+        const finalCard = $("final-summary-card");
+        const finalContent = $("final-summary-content");
+        const setupPanel = $("setup-panel");
+
+        langSelect.addEventListener("change", () => {
+          langOther.style.display =
+            langSelect.value === "other" ? "block" : "none";
+        });
+
+        /* ---------------- Logging ---------------- */
+        function log(tagKey, msg) {
+          const t = new Date();
+          const time = t.toTimeString().slice(0, 8);
+          const cfg = AGENTS[tagKey] || {
+            tag: tagKey === "err" ? "tag-err" : "tag-sys",
+            name: tagKey === "err" ? "error" : "system",
+          };
+          const row = document.createElement("div");
+          row.className = "l-row";
+          row.innerHTML = `<span class="l-time">${time}</span><span class="l-tag ${cfg.tag}">[${cfg.name.toLowerCase()}]</span><span></span>`;
+          row.querySelector("span:last-child").textContent = msg;
+          activityLog.appendChild(row);
+          activityLog.scrollTop = activityLog.scrollHeight;
+        }
+
+        function setStatus(mode, text) {
+          statusDot.className = "status-dot" + (mode ? " " + mode : "");
+          statusText.textContent = text;
+        }
+
+        /* ---------------- Output tabs ---------------- */
+        const outputs = {}; // key -> {label, content}
+        let activeTabKey = null;
+        function pushOutput(key, label, content) {
+          outputs[key] = { label, content };
+          renderTabs();
+          showTab(key);
+        }
+        function renderTabs() {
+          outputTabs.innerHTML = "";
+          Object.keys(outputs).forEach((key) => {
+            const b = document.createElement("button");
+            b.className = "btn btn-ghost";
+            b.style.padding = "6px 12px";
+            b.style.fontSize = "11.5px";
+            b.textContent = outputs[key].label;
+            b.addEventListener("click", () => showTab(key));
+            if (key === activeTabKey) {
+              b.style.borderColor = "var(--cyan-dim)";
+              b.style.color = "var(--text)";
+            }
+            outputTabs.appendChild(b);
+          });
+        }
+        function showTab(key) {
+          activeTabKey = key;
+          renderTabs();
+          const o = outputs[key];
+          if (!o) {
+            outputContent.innerHTML =
+              '<div class="empty-note">No output yet.</div>';
+            return;
+          }
+          const pre = document.createElement("pre");
+          pre.className = "code-block";
+          pre.textContent = o.content;
+          outputContent.innerHTML = "";
+          outputContent.appendChild(pre);
+        }
+
+        /* ---------------- Diagram ---------------- */
+        const nodes = [
+          {
+            id: "planner",
+            x: 60,
+            y: 120,
+            w: 120,
+            h: 60,
+            label: "PLANNER",
+            sub: "breaks down spec",
+          },
+          {
+            id: "executor",
+            x: 250,
+            y: 120,
+            w: 120,
+            h: 60,
+            label: "EXECUTOR",
+            sub: "writes first draft",
+          },
+          {
+            id: "evaluator",
+            x: 460,
+            y: 40,
+            w: 120,
+            h: 60,
+            label: "EVALUATOR",
+            sub: "scores 1–10",
+          },
+          {
+            id: "critic",
+            x: 650,
+            y: 120,
+            w: 120,
+            h: 60,
+            label: "CRITIC",
+            sub: "actionable critique",
+          },
+          {
+            id: "improver",
+            x: 460,
+            y: 200,
+            w: 120,
+            h: 60,
+            label: "IMPROVER",
+            sub: "rewrites draft",
+          },
+          {
+            id: "final",
+            x: 850,
+            y: 120,
+            w: 120,
+            h: 60,
+            label: "FINAL REVIEWER",
+            sub: "synthesizes verdict",
+          },
+        ];
+
+        function buildDiagram() {
+          const svg = $("diagram-svg");
+          let html = "";
+          // static connecting lines
+          html += `<path class="flow-line" d="M180,150 L250,150" marker-end="url(#arrow)"/>`;
+          html += `<path class="flow-line" d="M370,140 L460,80" marker-end="url(#arrow)"/>`;
+          html += `<path class="flow-line" d="M580,70 L650,130" marker-end="url(#arrow)"/>`;
+          html += `<path class="flow-line" d="M650,165 L580,210" marker-end="url(#arrow)"/>`;
+          html += `<path class="flow-line loop" d="M460,220 C 350,260 350,60 460,60" marker-end="url(#arrowloop)"/>`;
+          html += `<path class="flow-line branch" d="M770,140 L850,140" marker-end="url(#arrowbranch)"/>`;
+          html += `
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--line)"/></marker>
+        <marker id="arrowloop" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan-dim)"/></marker>
+        <marker id="arrowbranch" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--amber-dim)"/></marker>
+      </defs>`;
+          nodes.forEach((n) => {
+            html += `<g id="node-${n.id}">
+        <rect class="node-box" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="10"/>
+        <text class="node-label" x="${n.x + n.w / 2}" y="${n.y + 28}" text-anchor="middle">${n.label}</text>
+        <text class="node-sub" x="${n.x + n.w / 2}" y="${n.y + 44}" text-anchor="middle">${n.sub}</text>
+      </g>`;
+          });
+          html += `<circle id="pulse" class="pulse-dot-anim" cx="60" cy="150" r="4" style="display:none;"/>`;
+          html += `<text x="500" y="255" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)" font-size="10.5">loop: evaluator → critic → improver → (back to evaluator) — repeats until a stop condition fires</text>`;
+          svg.innerHTML = html;
+        }
+
+        function setActiveNode(id) {
+          nodes.forEach((n) => {
+            const el = document.getElementById("node-" + n.id);
+            if (!el) return;
+            const rect = el.querySelector("rect");
+            rect.classList.remove("active");
+            if (n.id === id) {
+              rect.classList.add("active");
+            }
+          });
+          activeAgentTag.textContent = id
+            ? AGENTS[id].name.toLowerCase()
+            : "idle";
+        }
+        function markDone(id) {
+          const el = document.getElementById("node-" + id);
+          if (el) el.querySelector("rect").classList.add("done");
+        }
+
+        function buildAgentExplainers() {
+          const wrap = $("agent-explainers");
+          wrap.innerHTML = "";
+          Object.keys(AGENTS).forEach((k) => {
+            const a = AGENTS[k];
+            const div = document.createElement("div");
+            div.className = "agent-card";
+            div.innerHTML = `<div class="a-name" style="color:${a.color}">${a.name}</div><div class="a-role">${a.role}</div>`;
+            wrap.appendChild(div);
+          });
+        }
+
+        /* ---------------- System prompts ---------------- */
+        function sysPrompt(agent, ctx) {
+          switch (agent) {
+            case "planner":
+              return `You are the Planner agent in an autonomous code-generation pipeline. Given a plain-language spec, produce a concise implementation plan for ${ctx.language}: list explicit requirements, edge cases to handle, and a short step-by-step approach. Do not write full code. Be specific and technical. Keep it under 250 words. Output plain text only, no markdown code fences.`;
+            case "executor":
+              return `You are the Executor agent in an autonomous code-generation pipeline. Write a complete, working, idiomatic ${ctx.language} implementation that satisfies the plan below. Include necessary comments/docstrings but keep it production-quality, not over-verbose. Output ONLY the code, no explanation before or after, no markdown fences.`;
+            case "evaluator":
+              return `You are the Evaluator agent in an autonomous code-generation pipeline. Score the given ${ctx.language} code draft strictly on CODE QUALITY: readability, naming, structure/organization, adherence to language idioms and best practices, documentation, and robustness to edge cases. Respond with STRICT JSON only, no markdown fences, no prose outside the JSON, in exactly this shape: {"score": <number 1-10, one decimal>, "strengths": "<short string>", "weaknesses": "<short string>"}`;
+            case "critic":
+              return `You are the Critic agent in an autonomous code-generation pipeline. Given the current code draft and the Evaluator's score/strengths/weaknesses, write a short, specific, actionable critique (3-6 bullet points as plain text lines, no markdown headers) telling the Improver exactly what to change to raise the quality score. Be concrete: refer to specific variables, functions, or patterns in the draft. Do not rewrite the code yourself.`;
+            case "improver":
+              return `You are the Improver agent in an autonomous code-generation pipeline. Rewrite the ${ctx.language} draft to address every point in the Critic's feedback and the Evaluator's stated weaknesses, while preserving what already scored well. Output ONLY the full revised code, no explanation, no markdown fences.`;
+            case "final":
+              return `You are the Final Reviewer agent in an autonomous code-generation pipeline. You do not write or edit code. Given the full round-by-round history (scores, critiques, deltas) and the final code draft, write a short final verdict (120-180 words, plain text) covering: overall quality assessment, how much the code improved across rounds, and any residual caveats a developer should know before shipping this.`;
+          }
+        }
+
+        /* ---------------- API call w/ retry ---------------- */
+        async function callAgent(agentKey, userMsg, ctx, retryLimit) {
+          retryLimit = retryLimit === undefined ? 2 : retryLimit;
+          let attempt = 0;
+          let lastErr = null;
+          while (attempt <= retryLimit) {
+            try {
+              const resp = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: MODEL,
+                  max_tokens: 1000,
+                  system: sysPrompt(agentKey, ctx),
+                  messages: [{ role: "user", content: userMsg }],
+                }),
+              });
+              if (!resp.ok) {
+                const errText = await resp.text().catch(() => "");
+                throw new Error(
+                  `HTTP ${resp.status}: ${errText.slice(0, 200)}`,
+                );
+              }
+              const data = await resp.json();
+              const textBlocks = (data.content || [])
+                .filter((b) => b.type === "text")
+                .map((b) => b.text);
+              const text = textBlocks.join("\n").trim();
+              if (!text) throw new Error("Empty response from model");
+              return text;
+            } catch (err) {
+              lastErr = err;
+              attempt++;
+              state.retries++;
+              log(
+                "err",
+                `${AGENTS[agentKey].name} call failed (attempt ${attempt}/${retryLimit + 1}): ${err.message}`,
+              );
+              if (attempt <= retryLimit) {
+                await new Promise((r) => setTimeout(r, 600 * attempt));
+              }
+            }
+          }
+          throw lastErr;
+        }
+
+        /* ---------------- Helpers ---------------- */
+        function stripFences(text) {
+          let t = text.trim();
+          t = t.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "");
+          return t.trim();
+        }
+        function parseEvalJSON(raw) {
+          let cleaned = stripFences(raw);
+          try {
+            return JSON.parse(cleaned);
+          } catch (e) {
+            const match = cleaned.match(/\{[\s\S]*\}/);
+            if (match) {
+              try {
+                return JSON.parse(match[0]);
+              } catch (e2) {}
+            }
+            // fallback: try to pull a number
+            const numMatch = cleaned.match(
+              /(\d+(\.\d+)?)\s*\/\s*10|score["']?\s*:\s*(\d+(\.\d+)?)/i,
+            );
+            const score = numMatch
+              ? parseFloat(numMatch[1] || numMatch[3])
+              : 5.0;
+            return {
+              score,
+              strengths: "(unparsed)",
+              weaknesses: cleaned.slice(0, 300),
+            };
+          }
+        }
+
+        function renderHistory() {
+          if (state.history.length === 0) {
+            historyWrap.innerHTML =
+              '<div class="empty-note">History will populate once evaluation rounds begin.</div>';
+            return;
+          }
+          let rows = "";
+          state.history.forEach((h) => {
+            const pct = Math.max(0, Math.min(100, (h.score / 10) * 100));
+            let deltaClass = "delta-flat",
+              deltaStr = "—";
+            if (h.delta !== null) {
+              deltaClass =
+                h.delta > 0.001
+                  ? "delta-up"
+                  : h.delta < -0.001
+                    ? "delta-down"
+                    : "delta-flat";
+              deltaStr = (h.delta > 0 ? "+" : "") + h.delta.toFixed(2);
+            }
+            rows += `<tr>
+        <td>#${h.round}</td>
+        <td><div class="score-bar-wrap"><div class="score-bar" style="width:${pct}%"></div></div>${h.score.toFixed(1)}</td>
+        <td class="${deltaClass}">${deltaStr}</td>
+        <td style="max-width:260px;white-space:normal;color:var(--muted);font-size:12px;">${h.weaknesses || ""}</td>
+      </tr>`;
+          });
+          historyWrap.innerHTML = `<table class="hist">
+      <thead><tr><th>Round</th><th>Score</th><th>Δ</th><th>Key weakness noted</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+        }
+
+        function renderMemory() {
+          if (state.memory.length === 0) {
+            memoryPanel.innerHTML =
+              '<div class="empty-note">No memory entries yet.</div>';
+            return;
+          }
+          memoryPanel.innerHTML = state.memory
+            .map(
+              (m) =>
+                `<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;border-left:2px solid var(--cyan-dim);padding-left:10px;"><b style="color:var(--text)">Round ${m.round}:</b> ${m.note}</div>`,
+            )
+            .join("");
+        }
+
+        function showStopBanner(kind, text) {
+          stopBanner.className = "stop-banner show " + kind;
+          stopBanner.textContent = text;
+        }
+
+        /* ---------------- Main pipeline ---------------- */
+        async function runPipeline() {
+          state.spec = specInput.value.trim();
+          state.language =
+            langSelect.value === "other"
+              ? langOther.value.trim() || "Python"
+              : langSelect.value;
+          state.threshold = parseFloat(thresholdInput.value) || 9.0;
+          state.delta = parseFloat(deltaInput.value) || 0.3;
+          if (!state.spec) {
+            alert("Please describe what the code should do.");
+            return;
+          }
+          state.history = [];
+          state.memory = [];
+          state.stopReason = null;
+          state.retries = 0;
+          renderHistory();
+          renderMemory();
+          stopBanner.className = "stop-banner";
+          finalCard.style.display = "none";
+          runBtn.disabled = true;
+          resetBtn.style.display = "none";
+          roundIndicator.style.display = "inline-flex";
+          setStatus("running", "Pipeline running...");
+
+          const ctx = { language: state.language };
+
+          try {
+            // ---- PLANNER ----
+            roundIndicatorText.textContent =
+              "Planning — designing implementation approach...";
+            setActiveNode("planner");
+            log(
+              "planner",
+              `Analyzing spec for ${state.language} implementation...`,
+            );
+            const plan = await callAgent(
+              "planner",
+              `Spec:\n${state.spec}`,
+              ctx,
+            );
+            state.plan = plan;
+            pushOutput("plan", "Plan", plan);
+            log("planner", "Plan produced.");
+            markDone("planner");
+
+            // ---- EXECUTOR (initial draft) ----
+            roundIndicatorText.textContent =
+              "Executing — writing first draft...";
+            setActiveNode("executor");
+            log(
+              "executor",
+              `Writing initial ${state.language} draft from plan...`,
+            );
+            const draft0 = await callAgent(
+              "executor",
+              `Spec:\n${state.spec}\n\nPlan:\n${plan}`,
+              ctx,
+            );
+            state.draft = stripFences(draft0);
+            pushOutput("draft-0", "Draft v0", state.draft);
+            log("executor", "Initial draft complete.");
+            markDone("executor");
+
+            // ---- LOOP: Evaluator -> Critic -> Improver ----
+            let round = 0;
+            let prevScore = null;
+            let plateauStreak = 0;
+            let stop = false;
+            let lastEval = null,
+              lastCritique = null;
+
+            while (!stop) {
+              round++;
+              roundIndicatorText.textContent = `Round ${round} — evaluating draft...`;
+              log("sys", `--- Round ${round} begins ---`);
+
+              // EVALUATOR
+              setActiveNode("evaluator");
+              log("evaluator", `Scoring draft v${round - 1}...`);
+              const evalCtxMsg =
+                `Spec:\n${state.spec}\n\nCurrent code draft:\n${state.draft}` +
+                (lastCritique
+                  ? `\n\nPrevious round's critique (was it addressed?):\n${lastCritique}`
+                  : "");
+              const evalRaw = await callAgent("evaluator", evalCtxMsg, ctx);
+              const evalParsed = parseEvalJSON(evalRaw);
+              const score =
+                typeof evalParsed.score === "number"
+                  ? evalParsed.score
+                  : parseFloat(evalParsed.score) || 5.0;
+              pushOutput(`eval-${round}`, `Eval R${round}`, evalRaw);
+              log("evaluator", `Score: ${score.toFixed(1)}/10`);
+              markDone("evaluator");
+
+              let delta = prevScore === null ? null : score - prevScore;
+              prevScore = score;
+
+              // CRITIC
+              roundIndicatorText.textContent = `Round ${round} — gathering critique...`;
+              setActiveNode("critic");
+              log("critic", "Compiling actionable critique...");
+              const criticMsg = `Spec:\n${state.spec}\n\nCode draft:\n${state.draft}\n\nEvaluator score: ${score}\nStrengths: ${evalParsed.strengths || ""}\nWeaknesses: ${evalParsed.weaknesses || ""}`;
+              const critique = await callAgent("critic", criticMsg, ctx);
+              lastCritique = critique;
+              pushOutput(`critic-${round}`, `Critique R${round}`, critique);
+              log("critic", "Critique ready.");
+              markDone("critic");
+
+              state.history.push({
+                round,
+                score,
+                delta,
+                weaknesses: (evalParsed.weaknesses || "").slice(0, 140),
+                strengths: evalParsed.strengths || "",
+                critique,
+              });
+              renderHistory();
+              state.memory.push({
+                round,
+                note: `Score ${score.toFixed(1)}; noted weakness → "${(evalParsed.weaknesses || "").slice(0, 90)}"`,
+              });
+              renderMemory();
+
+              // ---- STOP CHECKS (in order) ----
+              // 1. plateau: improvement < delta for 2 straight rounds
+              if (delta !== null && Math.abs(delta) < state.delta) {
+                plateauStreak++;
+              } else {
+                plateauStreak = 0;
+              }
+              if (plateauStreak >= 2) {
+                stop = true;
+                state.stopReason = {
+                  kind: "plateau",
+                  text: `Plateau reached: score improved by less than ${state.delta} for 2 consecutive rounds (round ${round - 1} → ${round}).`,
+                };
+              }
+              // 2. threshold
+              else if (score >= state.threshold) {
+                stop = true;
+                state.stopReason = {
+                  kind: "threshold",
+                  text: `Quality threshold reached: score ${score.toFixed(1)} crossed target ${state.threshold.toFixed(1)} at round ${round}.`,
+                };
+              }
+              // 3. hard cap
+              else if (round >= HARD_CAP) {
+                stop = true;
+                state.stopReason = {
+                  kind: "cap",
+                  text: `Hard iteration cap (${HARD_CAP} rounds) reached as a safety fallback — this was not the intended ending.`,
+                };
+              }
+
+              if (stop) {
+                log(
+                  "sys",
+                  `Stop condition fired: ${state.stopReason.kind.toUpperCase()}`,
+                );
+                showStopBanner(
+                  state.stopReason.kind,
+                  "⏹ " + state.stopReason.text,
+                );
+                markDone("critic");
+                break;
+              }
+
+              // IMPROVER
+              roundIndicatorText.textContent = `Round ${round} — improving draft...`;
+              setActiveNode("improver");
+              log("improver", "Rewriting draft using critique + evaluation...");
+              const improveMsg = `Spec:\n${state.spec}\n\nCurrent draft:\n${state.draft}\n\nEvaluator weaknesses: ${evalParsed.weaknesses || ""}\n\nCritic feedback:\n${critique}`;
+              const improved = await callAgent("improver", improveMsg, ctx);
+              state.draft = stripFences(improved);
+              pushOutput(`draft-${round}`, `Draft v${round}`, state.draft);
+              log("improver", `Draft v${round} produced.`);
+              markDone("improver");
+            }
+
+            // ---- FINAL REVIEWER ----
+            roundIndicatorText.textContent = `Finalizing — Final Reviewer synthesizing verdict...`;
+            setActiveNode("final");
+            log("final", "Synthesizing run history into final verdict...");
+            const historyText = state.history
+              .map(
+                (h) =>
+                  `Round ${h.round}: score ${h.score.toFixed(1)}${h.delta !== null ? ` (Δ ${h.delta > 0 ? "+" : ""}${h.delta.toFixed(2)})` : ""} — weaknesses: ${h.weaknesses}`,
+              )
+              .join("\n");
+            const finalMsg = `Spec:\n${state.spec}\n\nStop reason: ${state.stopReason.text}\n\nRound history:\n${historyText}\n\nFinal code:\n${state.draft}`;
+            const finalVerdict = await callAgent("final", finalMsg, ctx);
+            pushOutput("final-verdict", "Final verdict", finalVerdict);
+            log("final", "Final verdict complete.");
+            markDone("final");
+
+            renderFinalSummary(finalVerdict);
+            setActiveNode(null);
+            setStatus("done", "Pipeline complete");
+            roundIndicator.style.display = "none";
+            showTab("final-verdict");
+          } catch (err) {
+            log("err", "Pipeline halted: " + err.message);
+            setStatus("error", "Pipeline error — see log");
+            roundIndicatorText.textContent = "Halted due to error.";
+          } finally {
+            runBtn.disabled = false;
+            resetBtn.style.display = "inline-flex";
+          }
+        }
+
+        function renderFinalSummary(verdict) {
+          finalCard.style.display = "block";
+          const rounds = state.history.length;
+          const firstScore = state.history.length ? state.history[0].score : 0;
+          const lastScore = state.history.length
+            ? state.history[state.history.length - 1].score
+            : 0;
+          const improvement = (lastScore - firstScore).toFixed(1);
+          finalContent.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-box"><div class="num">${rounds}</div><div class="lab">Rounds run</div></div>
+        <div class="stat-box"><div class="num">${lastScore.toFixed(1)}</div><div class="lab">Final score</div></div>
+        <div class="stat-box"><div class="num">${improvement >= 0 ? "+" : ""}${improvement}</div><div class="lab">Net improvement</div></div>
+        <div class="stat-box"><div class="num">${state.retries}</div><div class="lab">API retries</div></div>
+      </div>
+      <p style="font-size:13.5px;color:var(--text);margin-bottom:14px;"><b>Stop reason:</b> ${state.stopReason.text}</p>
+      <p style="font-size:13.5px;color:var(--muted);white-space:pre-wrap;margin-bottom:16px;">${verdict}</p>
+      <h4 style="margin:0 0 8px;font-size:13px;">Final ${state.language} code</h4>
+      <pre class="code-block">${escapeHTML(state.draft)}</pre>
+    `;
+        }
+        function escapeHTML(s) {
+          return s
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+
+        /* ---------------- Prompt suggestions ---------------- */
+        const advancedPrompts = [
+          "Extend this pipeline with a Safety Monitor agent that runs before the Evaluator and flags unsafe code patterns.",
+          "Add a Memory Manager agent that persists lessons learned across multiple separate runs, not just one run's history.",
+          "Turn the single Executor into 3 parallel Executors, with the Evaluator picking the strongest draft each round.",
+          "Add a human approval checkpoint before the Final Reviewer commits to a final answer.",
+          "Generalize this studio so the interview can configure an entirely different domain, like content editing or research synthesis.",
+        ];
+        function buildPromptList() {
+          const wrap = $("prompt-list");
+          advancedPrompts.forEach((p) => {
+            const div = document.createElement("div");
+            div.className = "prompt-item";
+            div.innerHTML = `<span>${p}</span><span class="copy-hint">click to copy</span>`;
+            div.addEventListener("click", () => {
+              navigator.clipboard?.writeText(p).catch(() => {});
+              const hint = div.querySelector(".copy-hint");
+              const old = hint.textContent;
+              hint.textContent = "copied!";
+              setTimeout(() => (hint.textContent = old), 1200);
+            });
+            wrap.appendChild(div);
+          });
+        }
+
+        /* ---------------- Init ---------------- */
+        buildDiagram();
+        buildAgentExplainers();
+        buildPromptList();
+
+        runBtn.addEventListener("click", runPipeline);
+        resetBtn.addEventListener("click", () => {
+          location.reload();
+        });
+      })();
+    </script>
+  </body>
+</html>
