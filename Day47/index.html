@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Intelligence Studio</title>
+    <style>
+      :root {
+        --ink: #0b0e14;
+        --surface: #12151f;
+        --surface-2: #181c29;
+        --surface-3: #1f2433;
+        --border: #272c3d;
+        --text: #e7eaf0;
+        --muted: #8b93a7;
+        --muted-2: #5b6379;
+        --amber: #ffb454;
+        --amber-dim: #8a6534;
+        --teal: #5eead4;
+        --teal-dim: #1d4e48;
+        --red: #ff6b6b;
+        --green: #7ee787;
+        --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+        --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: "JetBrains Mono", "Courier New", monospace;
+      }
+      @font-face {
+        font-family: "Fraunces";
+        src: local("Fraunces");
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background:
+          radial-gradient(
+            ellipse at top left,
+            rgba(94, 234, 212, 0.06),
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at bottom right,
+            rgba(255, 180, 84, 0.05),
+            transparent 50%
+          ),
+          var(--ink);
+        color: var(--text);
+        font-family: var(--font-body);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 0 24px 100px;
+      }
+
+      /* ===== Header ===== */
+      header.masthead {
+        padding: 48px 24px 32px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          transparent
+        );
+      }
+      .masthead-inner {
+        max-width: 1160px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .brand-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .brand-eyebrow::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--teal);
+        box-shadow: 0 0 8px var(--teal);
+      }
+      h1.brand {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(32px, 4.5vw, 48px);
+        margin: 0;
+        letter-spacing: -0.01em;
+        line-height: 1.05;
+      }
+      h1.brand em {
+        font-style: italic;
+        color: var(--amber);
+        font-weight: 500;
+      }
+      .masthead-sub {
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 420px;
+        line-height: 1.5;
+        margin-top: 6px;
+      }
+      .masthead-meta {
+        text-align: right;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted-2);
+      }
+      .masthead-meta div {
+        margin-bottom: 4px;
+      }
+      .masthead-meta b {
+        color: var(--muted);
+      }
+
+      /* ===== Cards ===== */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        margin-top: 24px;
+      }
+      .card h2 {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 4px;
+        letter-spacing: -0.01em;
+      }
+      .card .card-sub {
+        color: var(--muted);
+        font-size: 13.5px;
+        margin: 0 0 20px;
+      }
+
+      /* ===== Setup summary chips ===== */
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 22px;
+      }
+      .chip {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        padding: 6px 12px;
+        border-radius: 100px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .chip b {
+        color: var(--teal);
+        font-weight: 600;
+      }
+
+      /* ===== Upload zone ===== */
+      .upload-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 760px) {
+        .upload-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      label.field-label {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      textarea#postText {
+        width: 100%;
+        min-height: 220px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 16px;
+        font-family: var(--font-body);
+        font-size: 14.5px;
+        line-height: 1.6;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      textarea#postText:focus {
+        border-color: var(--teal);
+      }
+      .dropzone {
+        border: 1.5px dashed var(--border);
+        border-radius: 10px;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        background: var(--surface-2);
+        text-align: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+      .dropzone:hover,
+      .dropzone.drag {
+        border-color: var(--amber);
+        background: rgba(255, 180, 84, 0.04);
+      }
+      .dropzone .dz-icon {
+        font-size: 28px;
+        opacity: 0.6;
+      }
+      .dropzone .dz-text {
+        color: var(--muted);
+        font-size: 13.5px;
+      }
+      .dropzone .dz-text b {
+        color: var(--text);
+      }
+      .dropzone img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        object-fit: contain;
+      }
+      .dropzone .dz-remove {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(11, 14, 20, 0.8);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        border-radius: 6px;
+        width: 26px;
+        height: 26px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      input[type="file"] {
+        display: none;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        letter-spacing: 0.03em;
+        padding: 14px 26px;
+        border-radius: 9px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition:
+          transform 0.1s,
+          box-shadow 0.15s,
+          opacity 0.15s;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--amber), #ff9d4d);
+        color: #1a1204;
+        box-shadow: 0 4px 20px rgba(255, 180, 84, 0.25);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 6px 26px rgba(255, 180, 84, 0.4);
+      }
+      .btn-primary:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .btn-ghost:hover {
+        color: var(--text);
+        border-color: var(--muted-2);
+      }
+      .btn-small {
+        padding: 9px 16px;
+        font-size: 12px;
+      }
+
+      /* ===== Newsroom / reviewer panel ===== */
+      .reviewer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 6px;
+      }
+      .reviewer-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          border-color 0.3s,
+          background 0.3s;
+      }
+      .reviewer-card.active {
+        border-color: var(--teal);
+        background: rgba(94, 234, 212, 0.05);
+      }
+      .reviewer-card.done {
+        border-color: var(--amber-dim);
+      }
+      .reviewer-card .rc-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .reviewer-card .rc-name {
+        font-weight: 600;
+        font-size: 13.5px;
+      }
+      .rc-status {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted-2);
+      }
+      .reviewer-card.active .rc-status {
+        color: var(--teal);
+      }
+      .reviewer-card.done .rc-status {
+        color: var(--amber);
+      }
+      .rc-desc {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .spinner {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        border-top-color: var(--teal);
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .rc-check {
+        color: var(--amber);
+        font-size: 13px;
+      }
+
+      /* activity log */
+      .log-box {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 18px;
+        max-height: 180px;
+        overflow-y: auto;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .log-line {
+        padding: 3px 0;
+        display: flex;
+        gap: 8px;
+      }
+      .log-line .t {
+        color: var(--muted-2);
+        flex-shrink: 0;
+      }
+      .log-line.hi {
+        color: var(--teal);
+      }
+
+      /* ===== Score dial ===== */
+      .score-hero {
+        display: flex;
+        gap: 36px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .dial-wrap {
+        position: relative;
+        width: 168px;
+        height: 168px;
+        flex-shrink: 0;
+      }
+      .dial-num {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .dial-num .n {
+        font-family: var(--font-display);
+        font-size: 44px;
+        font-weight: 600;
+        line-height: 1;
+      }
+      .dial-num .lbl {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        margin-top: 4px;
+      }
+      .score-summary {
+        flex: 1;
+        min-width: 240px;
+      }
+      .score-summary p {
+        color: var(--muted);
+        line-height: 1.65;
+        font-size: 14.5px;
+      }
+
+      /* category bars */
+      .cat-list {
+        margin-top: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .cat-row {
+      }
+      .cat-row .cat-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        margin-bottom: 6px;
+      }
+      .cat-row .cat-name {
+        font-weight: 600;
+      }
+      .cat-row .cat-score {
+        font-family: var(--font-mono);
+        color: var(--teal);
+      }
+      .cat-bar-track {
+        height: 6px;
+        background: var(--surface-3);
+        border-radius: 100px;
+        overflow: hidden;
+      }
+      .cat-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--teal), var(--amber));
+        border-radius: 100px;
+        width: 0%;
+        transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .cat-note {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 6px;
+        line-height: 1.5;
+      }
+
+      /* two column lists */
+      .swap-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 4px;
+      }
+      @media (max-width: 760px) {
+        .swap-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .list-block h3 {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 0 0 12px;
+      }
+      .list-block.strengths h3 {
+        color: var(--green);
+      }
+      .list-block.weaknesses h3 {
+        color: var(--red);
+      }
+      .list-block.opps h3 {
+        color: var(--amber);
+      }
+      ul.plain {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      ul.plain li {
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: var(--text);
+        padding-left: 18px;
+        position: relative;
+      }
+      ul.plain li::before {
+        content: "—";
+        position: absolute;
+        left: 0;
+        color: var(--muted-2);
+      }
+      .strengths li::before {
+        content: "+";
+        color: var(--green);
+      }
+      .weaknesses li::before {
+        content: "−";
+        color: var(--red);
+      }
+      .opps li::before {
+        content: "↑";
+        color: var(--amber);
+      }
+
+      /* prose render */
+      .prose {
+        font-size: 14.5px;
+        line-height: 1.75;
+        color: var(--text);
+      }
+      .prose h4 {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+        margin: 20px 0 8px;
+      }
+      .prose h4:first-child {
+        margin-top: 0;
+      }
+      .prose p {
+        margin: 0 0 12px;
+      }
+      .prose ul {
+        margin: 0 0 12px;
+        padding-left: 20px;
+      }
+      .prose li {
+        margin-bottom: 6px;
+      }
+      .prose strong {
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .prose em {
+        color: var(--amber);
+        font-style: normal;
+      }
+
+      /* rewrite compare */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 760px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compare-col {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px;
+      }
+      .compare-col.after {
+        border-color: var(--teal-dim);
+        background: rgba(94, 234, 212, 0.03);
+      }
+      .compare-tag {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: block;
+      }
+      .compare-col.after .compare-tag {
+        color: var(--teal);
+      }
+      .compare-body {
+        font-size: 13.5px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+      }
+
+      /* hooks */
+      .hook-item {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        line-height: 1.55;
+        position: relative;
+        padding-left: 44px;
+      }
+      .hook-item .hn {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--amber);
+      }
+
+      /* checklist */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .check-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 13.5px;
+        line-height: 1.5;
+        padding: 10px 12px;
+        background: var(--surface-2);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+      .check-item .cb {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid var(--muted-2);
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* predicted performance */
+      .predict-row {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .predict-metric {
+        flex: 1;
+        min-width: 140px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .predict-metric .pm-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+      }
+      .predict-metric .pm-val {
+        font-family: var(--font-display);
+        font-size: 26px;
+        margin-top: 6px;
+        color: var(--teal);
+      }
+      .ai-estimate-note {
+        font-size: 11.5px;
+        color: var(--muted-2);
+        margin-top: 14px;
+        font-style: italic;
+      }
+
+      /* deeper prompts */
+      .prompt-chip {
+        display: inline-block;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin: 0 8px 8px 0;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .prompt-chip:hover {
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+
+      /* error / loading */
+      .error-box {
+        background: rgba(255, 107, 107, 0.08);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        color: #ffb3b3;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 13.5px;
+        margin-top: 16px;
+      }
+      .error-box button {
+        margin-top: 10px;
+      }
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          var(--surface-2) 25%,
+          var(--surface-3) 50%,
+          var(--surface-2) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 8px;
+        height: 14px;
+        margin-bottom: 8px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      footer.foot {
+        text-align: center;
+        color: var(--muted-2);
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        padding: 40px 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="masthead-inner">
+        <div>
+          <p class="brand-eyebrow">AI Editorial Desk</p>
+          <h1 class="brand">Content Intelligence <em>Studio</em></h1>
+          <p class="masthead-sub">
+            A live newsroom of specialist AI reviewers, reading your post the
+            way your audience will — then telling you exactly how to earn the
+            scroll-stop.
+          </p>
+        </div>
+        <div class="masthead-meta">
+          <div><b>Format</b> LinkedIn post / carousel</div>
+          <div><b>Objective</b> Maximize engagement</div>
+          <div><b>Review mode</b> Gentle & encouraging</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <!-- ===== UPLOAD CARD ===== -->
+      <section class="card" id="uploadCard">
+        <h2>Bring your post to the desk</h2>
+        <p class="card-sub">
+          Paste the text of your LinkedIn post and, if you have one, attach the
+          carousel slide, screenshot, or graphic that ships with it.
+        </p>
+
+        <div class="upload-grid">
+          <div>
+            <label class="field-label" for="postText">Post text</label>
+            <textarea
+              id="postText"
+              placeholder="Paste your LinkedIn post copy here…"
+            ></textarea>
+          </div>
+          <div>
+            <label class="field-label">Image / screenshot (optional)</label>
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="fileInput" accept="image/*" />
+              <div id="dzEmpty">
+                <div class="dz-icon">🖼️</div>
+                <div class="dz-text">
+                  <b>Click to upload</b> or drag an image here<br />Slide,
+                  screenshot, or thumbnail
+                </div>
+              </div>
+              <img id="dzPreview" class="hidden" alt="preview" />
+              <button
+                class="dz-remove hidden"
+                id="dzRemove"
+                title="Remove image"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip"><b>Content:</b> LinkedIn post/carousel</span>
+          <span class="chip"><b>Platform:</b> LinkedIn</span>
+          <span class="chip"><b>Goal:</b> Engagement</span>
+          <span class="chip"><b>Tone:</b> Gentle & encouraging</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="startBtn">
+            Send to the review desk →
+          </button>
+          <button class="btn btn-ghost" id="sampleBtn">
+            Load a sample post
+          </button>
+        </div>
+        <div id="uploadError"></div>
+      </section>
+
+      <!-- ===== NEWSROOM / LIVE REVIEW ===== -->
+      <section class="card hidden" id="newsroomCard">
+        <h2>The desk is reviewing your post</h2>
+        <p class="card-sub" id="newsroomSub">
+          Five specialists are reading your post in sequence, each building on
+          the last.
+        </p>
+        <div class="reviewer-grid" id="reviewerGrid"></div>
+        <div class="log-box" id="logBox"></div>
+      </section>
+
+      <!-- ===== RESULTS ===== -->
+      <section id="resultsWrap" class="hidden">
+        <section class="card fade-in">
+          <h2>Overall content score</h2>
+          <p class="card-sub">
+            A composite read from every reviewer on the desk — a signal, not a
+            verdict.
+          </p>
+          <div class="score-hero">
+            <div class="dial-wrap">
+              <svg width="168" height="168" viewBox="0 0 168 168">
+                <circle
+                  cx="84"
+                  cy="84"
+                  r="72"
+                  fill="none"
+                  stroke="#1F2433"
+                  stroke-width="12"
+                />
+                <circle
+                  id="dialCircle"
+                  cx="84"
+                  cy="84"
+                  r="72"
+                  fill="none"
+                  stroke="url(#dialGrad)"
+                  stroke-width="12"
+                  stroke-linecap="round"
+                  stroke-dasharray="452"
+                  stroke-dashoffset="452"
+                  transform="rotate(-90 84 84)"
+                />
+                <defs>
+                  <linearGradient
+                    id="dialGrad"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stop-color="#5EEAD4" />
+                    <stop offset="100%" stop-color="#FFB454" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="dial-num">
+                <span class="n" id="dialNum">--</span
+                ><span class="lbl">OUT OF 100</span>
+              </div>
+            </div>
+            <div class="score-summary">
+              <p id="execSummary">—</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Category breakdown</h2>
+          <p class="card-sub">
+            How each dimension of the post performed, in the reviewers' own
+            words.
+          </p>
+          <div class="cat-list" id="catList"></div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>What's working, what's not, what's missing</h2>
+          <div class="swap-grid" style="margin-bottom: 20px">
+            <div class="list-block strengths">
+              <h3>Strengths</h3>
+              <ul class="plain" id="listStrengths"></ul>
+            </div>
+            <div class="list-block weaknesses">
+              <h3>Weaknesses</h3>
+              <ul class="plain" id="listWeaknesses"></ul>
+            </div>
+          </div>
+          <div class="list-block opps">
+            <h3>Missed opportunities</h3>
+            <ul class="plain" id="listOpps"></ul>
+          </div>
+        </section>
+
+        <section class="card fade-in" id="visualCard">
+          <h2>Visual reviewer notes</h2>
+          <p class="card-sub">Direct analysis of the attached image.</p>
+          <div class="prose" id="visualNotes"></div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Before vs. after</h2>
+          <p class="card-sub">
+            A rewritten version applying the desk's top recommendations.
+          </p>
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <span class="compare-tag">Before — your draft</span>
+              <div class="compare-body" id="beforeText"></div>
+            </div>
+            <div class="compare-col after">
+              <span class="compare-tag">After — rewritten by the desk</span>
+              <div class="compare-body" id="afterText"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Alternative hooks &amp; titles</h2>
+          <p class="card-sub">
+            Five different scroll-stopping openers to test.
+          </p>
+          <div id="hooksList"></div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Publishing checklist</h2>
+          <div class="checklist" id="checklist"></div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Predicted performance potential</h2>
+          <p class="card-sub">
+            An AI estimate, not a guarantee — treat as directional, not
+            statistical.
+          </p>
+          <div class="predict-row" id="predictRow"></div>
+          <p class="ai-estimate-note">
+            These figures are Claude's qualitative estimate based on the content
+            alone, not a data-backed forecast. Actual results depend on your
+            network, timing, and algorithm shifts.
+          </p>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Content health report</h2>
+          <div class="prose" id="healthReport"></div>
+        </section>
+
+        <section class="card fade-in">
+          <h2>Go deeper</h2>
+          <p class="card-sub">
+            Send these follow-ups back to the desk for a more targeted pass.
+          </p>
+          <div id="deeperPrompts"></div>
+        </section>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="restartBtn">
+            ↺ Review another post
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="foot">
+      CONTENT INTELLIGENCE STUDIO — powered live by Claude — no analysis is
+      cached, scripted, or precomputed
+    </footer>
+
+    <script>
+      (function () {
+        const MODEL = "claude-sonnet-4-5";
+        const API_URL = "https://api.anthropic.com/v1/messages";
+
+        // ---------- state ----------
+        let uploadedImage = null; // {mediaType, base64}
+        let logEntries = [];
+        let reviewOutputs = {}; // id -> raw text
+
+        const REVIEWERS = [
+          {
+            id: "hook",
+            name: "Hook & Scroll-Stop",
+            desc: "Tests whether the first 2 lines earn the 'see more' click.",
+            system: `You are a warm, encouraging LinkedIn hook specialist reviewing a post's opening lines for scroll-stopping power. Be gentle and constructive — this creator is learning. Respond in plain text only, never JSON, never markdown code fences. Structure your answer with these exact section headers on their own line, each followed by content:
+HOOK SCORE: [number]/100
+HOOK ANALYSIS: [2-4 sentences on why the opening does or doesn't stop the scroll, said kindly]
+STRENGTHS: [1-3 short bullet lines starting with a dash]
+FIXES: [1-3 short bullet lines starting with a dash, concrete and encouraging]
+Keep the whole response under 220 words.`,
+          },
+          {
+            id: "structure",
+            name: "Structure & Readability",
+            desc: "Reviews formatting, pacing, line breaks, and mobile readability.",
+            system: `You are a kind, detail-oriented LinkedIn readability editor. Be encouraging. Respond in plain text only, never JSON, never markdown code fences. Use these exact section headers:
+STRUCTURE SCORE: [number]/100
+STRUCTURE ANALYSIS: [2-4 sentences on formatting, whitespace, line length, skimmability on mobile]
+STRENGTHS: [1-3 short bullet lines starting with a dash]
+FIXES: [1-3 short bullet lines starting with a dash]
+Keep the whole response under 220 words.`,
+          },
+          {
+            id: "psychology",
+            name: "Engagement Psychology",
+            desc: "Evaluates emotional pull, relatability, and comment-bait.",
+            system: `You are a gentle behavioral psychologist specializing in what makes people comment, share, and engage on LinkedIn. Respond in plain text only, never JSON, never markdown code fences. Use these exact section headers:
+ENGAGEMENT SCORE: [number]/100
+ENGAGEMENT ANALYSIS: [2-4 sentences on emotional resonance, relatability, and whether it invites a response]
+STRENGTHS: [1-3 short bullet lines starting with a dash]
+FIXES: [1-3 short bullet lines starting with a dash]
+Keep the whole response under 220 words.`,
+          },
+          {
+            id: "platform",
+            name: "LinkedIn Algorithm Fit",
+            desc: "Checks platform-native conventions and distribution potential.",
+            system: `You are a friendly LinkedIn platform strategist who understands current best practices for organic reach (dwell time, native formatting, hashtag use, first-hour engagement signals). Respond in plain text only, never JSON, never markdown code fences. Use these exact section headers:
+PLATFORM SCORE: [number]/100
+PLATFORM ANALYSIS: [2-4 sentences on LinkedIn-native fit and distribution potential]
+STRENGTHS: [1-3 short bullet lines starting with a dash]
+FIXES: [1-3 short bullet lines starting with a dash]
+Keep the whole response under 220 words.`,
+          },
+          {
+            id: "visual",
+            name: "Visual Reviewer",
+            desc: "Analyzes the attached image or slide directly.",
+            conditional: "image",
+            system: `You are a warm, encouraging visual content reviewer for LinkedIn graphics and carousel slides. Look directly at the attached image. Respond in plain text only, never JSON, never markdown code fences. Use these exact section headers:
+VISUAL SCORE: [number]/100
+VISUAL ANALYSIS: [3-5 sentences describing what you actually see in the image and how well it supports the post's message, legibility, contrast, branding, mobile-friendliness]
+STRENGTHS: [1-3 short bullet lines starting with a dash]
+FIXES: [1-3 short bullet lines starting with a dash]
+Keep the whole response under 220 words.`,
+          },
+          {
+            id: "editor",
+            name: "Editor-in-Chief",
+            desc: "Synthesizes every review into the final report.",
+            final: true,
+            system: `You are the warm, encouraging Editor-in-Chief of a premium LinkedIn content studio, synthesizing feedback from your specialist reviewers into one cohesive final report for the creator. Be gentle, specific, and genuinely helpful — never harsh. Respond in plain text only, never JSON, never markdown fences, no asterisk bullets with bold markdown syntax beyond simple **word** for emphasis is fine sparingly. Use exactly these section headers, each on its own line, followed by the content, in this exact order:
+
+OVERALL SCORE: [single number 0-100]
+EXECUTIVE SUMMARY: [3-4 warm, encouraging sentences summarizing the post's overall quality and potential]
+CATEGORY: Hook | [score]/100 | [one sentence note]
+CATEGORY: Structure | [score]/100 | [one sentence note]
+CATEGORY: Engagement Psychology | [score]/100 | [one sentence note]
+CATEGORY: Platform Fit | [score]/100 | [one sentence note]
+STRENGTHS: [3-5 short bullet lines starting with a dash, each a full sentence]
+WEAKNESSES: [3-5 short bullet lines starting with a dash, each a full sentence, phrased kindly]
+OPPORTUNITIES: [3-5 short bullet lines starting with a dash of missed opportunities]
+REWRITE: [a full rewritten version of the post, 80-180 words, applying the top fixes, ready to paste into LinkedIn, using real line breaks]
+HOOK 1: [alternative opening line]
+HOOK 2: [alternative opening line]
+HOOK 3: [alternative opening line]
+HOOK 4: [alternative opening line]
+HOOK 5: [alternative opening line]
+CHECKLIST: [5-7 short bullet lines starting with a dash, concrete pre-publish checks]
+PREDICTED REACH: [one short phrase like "Moderate" or "Strong" with a 3-6 word qualifier]
+PREDICTED COMMENTS: [one short phrase estimate]
+PREDICTED SAVES: [one short phrase estimate]
+HEALTH REPORT: [3-5 sentences giving an overall content health narrative, encouraging tone, mentioning the single highest-impact improvement clearly]
+DEEPER PROMPT 1: [a short follow-up question the creator could ask the desk for a deeper pass]
+DEEPER PROMPT 2: [a short follow-up question]
+DEEPER PROMPT 3: [a short follow-up question]
+
+If no image was provided, skip nothing — just note visual fit as N/A within relevant sections. Keep the entire response under 900 words.`,
+          },
+        ];
+
+        // ---------- DOM refs ----------
+        const $ = (id) => document.getElementById(id);
+        const postText = $("postText");
+        const dropzone = $("dropzone");
+        const fileInput = $("fileInput");
+        const dzEmpty = $("dzEmpty");
+        const dzPreview = $("dzPreview");
+        const dzRemove = $("dzRemove");
+        const startBtn = $("startBtn");
+        const sampleBtn = $("sampleBtn");
+        const uploadError = $("uploadError");
+        const uploadCard = $("uploadCard");
+        const newsroomCard = $("newsroomCard");
+        const reviewerGrid = $("reviewerGrid");
+        const logBox = $("logBox");
+        const resultsWrap = $("resultsWrap");
+        const restartBtn = $("restartBtn");
+
+        // ---------- upload interactions ----------
+        dropzone.addEventListener("click", () => fileInput.click());
+        dropzone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropzone.classList.add("drag");
+        });
+        dropzone.addEventListener("dragleave", () =>
+          dropzone.classList.remove("drag"),
+        );
+        dropzone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("drag");
+          if (e.dataTransfer.files && e.dataTransfer.files[0])
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+        dzRemove.addEventListener("click", (e) => {
+          e.stopPropagation();
+          uploadedImage = null;
+          dzPreview.classList.add("hidden");
+          dzRemove.classList.add("hidden");
+          dzEmpty.classList.remove("hidden");
+          fileInput.value = "";
+        });
+
+        function handleFile(file) {
+          if (!file.type.startsWith("image/")) {
+            showUploadError("Please upload an image file.");
+            return;
+          }
+          if (file.size > 8 * 1024 * 1024) {
+            showUploadError("Image is too large — please keep it under 8MB.");
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            const base64 = dataUrl.split(",")[1];
+            uploadedImage = { mediaType: file.type, base64 };
+            dzPreview.src = dataUrl;
+            dzPreview.classList.remove("hidden");
+            dzRemove.classList.remove("hidden");
+            dzEmpty.classList.add("hidden");
+          };
+          reader.onerror = () =>
+            showUploadError(
+              "Could not read that image. Please try another file.",
+            );
+          reader.readAsDataURL(file);
+        }
+
+        function showUploadError(msg) {
+          uploadError.innerHTML = `<div class="error-box">${escapeHtml(msg)}</div>`;
+          setTimeout(() => {
+            uploadError.innerHTML = "";
+          }, 4500);
+        }
+
+        sampleBtn.addEventListener("click", () => {
+          postText.value = `I got rejected from 47 jobs before I landed my first data analyst role.\n\nHere's what nobody tells you about the job search:\n\nMost of that rejection had nothing to do with my skills. It was my resume format, my LinkedIn headline, and the fact that I was applying to roles I wasn't even excited about.\n\nWhat changed everything:\n1. I rewrote my headline around outcomes, not titles\n2. I started reaching out to hiring managers directly\n3. I stopped applying to everything and started applying to the right things\n\nThe 48th application got me the offer.\n\nIf you're in the middle of a hard search right now — it's not you. It's the strategy.\n\nWhat's one thing that changed your job search? Drop it below.`;
+        });
+
+        restartBtn.addEventListener("click", () => location.reload());
+
+        // ---------- start review ----------
+        startBtn.addEventListener("click", () => {
+          const text = postText.value.trim();
+          if (!text) {
+            showUploadError(
+              "Add your post text before sending it to the desk.",
+            );
+            return;
+          }
+          runReview(text);
+        });
+
+        async function runReview(text) {
+          uploadCard.classList.add("hidden");
+          newsroomCard.classList.remove("hidden");
+          resultsWrap.classList.add("hidden");
+          logEntries = [];
+          reviewOutputs = {};
+
+          const activeReviewers = REVIEWERS.filter(
+            (r) => r.conditional !== "image" || uploadedImage,
+          );
+          renderReviewerGrid(activeReviewers);
+          log("Post received. Assembling the review desk…", true);
+
+          let priorContext = "";
+          for (let i = 0; i < activeReviewers.length; i++) {
+            const r = activeReviewers[i];
+            setReviewerState(r.id, "active");
+            log(`${r.name} is reading the post…`);
+            try {
+              const output = await callReviewer(r, text, priorContext);
+              reviewOutputs[r.id] = output;
+              priorContext += `\n\n[${r.name} notes]\n${output}`;
+              setReviewerState(r.id, "done");
+              log(`${r.name} finished their notes.`, true);
+            } catch (err) {
+              setReviewerState(r.id, "done");
+              log(`${r.name} hit an error: ${err.message}. Retrying once…`);
+              try {
+                const output = await callReviewer(r, text, priorContext);
+                reviewOutputs[r.id] = output;
+                priorContext += `\n\n[${r.name} notes]\n${output}`;
+                log(`${r.name} recovered and finished.`, true);
+              } catch (err2) {
+                reviewOutputs[r.id] = "";
+                log(
+                  `${r.name} could not complete their review. Continuing without it.`,
+                );
+              }
+            }
+          }
+
+          log("Editor-in-Chief compiling the final report…", true);
+          renderResults(reviewOutputs, text);
+        }
+
+        function renderReviewerGrid(list) {
+          reviewerGrid.innerHTML = list
+            .map(
+              (r) => `
+      <div class="reviewer-card" id="rc-${r.id}">
+        <div class="rc-top">
+          <span class="rc-name">${escapeHtml(r.name)}</span>
+          <span class="rc-status" id="rcstatus-${r.id}">Queued</span>
+        </div>
+        <div class="rc-desc">${escapeHtml(r.desc)}</div>
+      </div>
+    `,
+            )
+            .join("");
+        }
+
+        function setReviewerState(id, state) {
+          const card = $("rc-" + id);
+          const status = $("rcstatus-" + id);
+          if (!card) return;
+          card.classList.remove("active", "done");
+          if (state === "active") {
+            card.classList.add("active");
+            status.innerHTML = '<span class="spinner"></span> Reviewing';
+          } else if (state === "done") {
+            card.classList.add("done");
+            status.innerHTML = '<span class="rc-check">✓</span> Complete';
+          }
+        }
+
+        function log(msg, hi) {
+          const time = new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+          logEntries.push({ time, msg, hi });
+          logBox.innerHTML = logEntries
+            .map(
+              (e) =>
+                `<div class="log-line ${e.hi ? "hi" : ""}"><span class="t">${e.time}</span><span>${escapeHtml(e.msg)}</span></div>`,
+            )
+            .join("");
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // ---------- API call ----------
+        async function callReviewer(reviewer, text, priorContext) {
+          const contentBlocks = [];
+          if (reviewer.conditional === "image" && uploadedImage) {
+            contentBlocks.push({
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: uploadedImage.mediaType,
+                data: uploadedImage.base64,
+              },
+            });
+          } else if (reviewer.final && uploadedImage) {
+            contentBlocks.push({
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: uploadedImage.mediaType,
+                data: uploadedImage.base64,
+              },
+            });
+          }
+
+          let promptText = `POST TEXT:\n${text}`;
+          if (reviewer.final) {
+            promptText += `\n\nPRIOR REVIEWER NOTES:${priorContext || " none"}\n\nWrite the final synthesized report now, following the exact section header format from your instructions.`;
+          } else if (priorContext) {
+            promptText += `\n\nEarlier reviewer notes for context (do not repeat them, just consider them):${priorContext}`;
+          }
+          if (reviewer.conditional === "image") {
+            promptText += `\n\nThe attached image is the visual/carousel slide that accompanies this post. Analyze it directly.`;
+          }
+          contentBlocks.push({ type: "text", text: promptText });
+
+          const body = {
+            model: MODEL,
+            max_tokens: reviewer.final ? 1800 : 500,
+            system: reviewer.system,
+            messages: [{ role: "user", content: contentBlocks }],
+          };
+
+          const resp = await fetchWithRetry(body);
+          const data = await resp.json();
+          const textBlocks = (data.content || [])
+            .filter((b) => b.type === "text")
+            .map((b) => b.text);
+          const combined = textBlocks.join("\n").trim();
+          if (!combined) throw new Error("empty response");
+          return combined;
+        }
+
+        async function fetchWithRetry(body, attempts = 2) {
+          let lastErr;
+          for (let i = 0; i < attempts; i++) {
+            try {
+              const resp = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+              });
+              if (!resp.ok) {
+                const errText = await resp.text().catch(() => "");
+                throw new Error(
+                  `API error ${resp.status} ${errText.slice(0, 120)}`,
+                );
+              }
+              return resp;
+            } catch (e) {
+              lastErr = e;
+              if (i < attempts - 1)
+                await new Promise((r) => setTimeout(r, 700));
+            }
+          }
+          throw lastErr;
+        }
+
+        // ---------- parsing helpers ----------
+        function extractField(text, label) {
+          // matches "LABEL: rest of line, possibly continuing until next known label or double newline"
+          const re = new RegExp(
+            label.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&") +
+              "\\s*:\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z0-9 &\\-]*:\\s|$)",
+            "i",
+          );
+          const m = text.match(re);
+          return m ? m[1].trim() : "";
+        }
+        function extractBullets(block) {
+          if (!block) return [];
+          return block
+            .split("\n")
+            .map((l) => l.replace(/^[-•*]\s*/, "").trim())
+            .filter(Boolean);
+        }
+        function extractScore(str) {
+          if (!str) return null;
+          const m = str.match(/(\d{1,3})/);
+          return m ? Math.min(100, parseInt(m[1], 10)) : null;
+        }
+        function escapeHtml(s) {
+          return (s || "").replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[c],
+          );
+        }
+        function simpleProse(text) {
+          if (!text) return "<p>—</p>";
+          return text
+            .split(/\n{2,}/)
+            .map(
+              (p) =>
+                `<p>${escapeHtml(p).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")}</p>`,
+            )
+            .join("");
+        }
+
+        // ---------- render results ----------
+        function renderResults(outputs, originalText) {
+          newsroomCard.classList.add("hidden");
+          resultsWrap.classList.remove("hidden");
+
+          const editor = outputs.editor || "";
+          const overall =
+            extractScore(extractField(editor, "OVERALL SCORE")) ?? 72;
+          $("dialNum").textContent = overall;
+          const circumference = 452;
+          const offset = circumference - (circumference * overall) / 100;
+          requestAnimationFrame(() => {
+            $("dialCircle").style.transition =
+              "stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)";
+            $("dialCircle").style.strokeDashoffset = offset;
+          });
+
+          $("execSummary").textContent =
+            extractField(editor, "EXECUTIVE SUMMARY") ||
+            "Report generated — see sections below for details.";
+
+          // categories
+          const catMatches = [
+            ...editor.matchAll(
+              /CATEGORY:\s*(.+?)\s*\|\s*(\d{1,3})\/100\s*\|\s*(.+)/g,
+            ),
+          ];
+          const catList = $("catList");
+          if (catMatches.length) {
+            catList.innerHTML = catMatches
+              .map(
+                (m) => `
+        <div class="cat-row">
+          <div class="cat-top"><span class="cat-name">${escapeHtml(m[1].trim())}</span><span class="cat-score">${m[2]}/100</span></div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" data-w="${m[2]}"></div></div>
+          <div class="cat-note">${escapeHtml(m[3].trim())}</div>
+        </div>
+      `,
+              )
+              .join("");
+            requestAnimationFrame(() => {
+              document.querySelectorAll(".cat-bar-fill").forEach((el) => {
+                el.style.width = el.dataset.w + "%";
+              });
+            });
+          } else {
+            catList.innerHTML =
+              '<p class="cat-note">No category breakdown returned — see executive summary above.</p>';
+          }
+
+          // strengths / weaknesses / opps
+          fillList(
+            "listStrengths",
+            extractBullets(extractField(editor, "STRENGTHS")),
+          );
+          fillList(
+            "listWeaknesses",
+            extractBullets(extractField(editor, "WEAKNESSES")),
+          );
+          fillList(
+            "listOpps",
+            extractBullets(extractField(editor, "OPPORTUNITIES")),
+          );
+
+          // visual
+          if (uploadedImage && outputs.visual) {
+            $("visualCard").classList.remove("hidden");
+            $("visualNotes").innerHTML = simpleProse(
+              extractField(outputs.visual, "VISUAL ANALYSIS") || outputs.visual,
+            );
+          } else {
+            $("visualCard").classList.add("hidden");
+          }
+
+          // before/after
+          $("beforeText").textContent = originalText;
+          $("afterText").textContent =
+            extractField(editor, "REWRITE") ||
+            "Rewrite unavailable — try running the review again.";
+
+          // hooks
+          const hooksHtml = [1, 2, 3, 4, 5]
+            .map((n) => {
+              const h = extractField(editor, `HOOK ${n}`);
+              return h
+                ? `<div class="hook-item"><span class="hn">${n}</span>${escapeHtml(h)}</div>`
+                : "";
+            })
+            .join("");
+          $("hooksList").innerHTML =
+            hooksHtml ||
+            '<p class="cat-note">No alternative hooks returned.</p>';
+
+          // checklist
+          const checks = extractBullets(extractField(editor, "CHECKLIST"));
+          $("checklist").innerHTML = checks.length
+            ? checks
+                .map(
+                  (c) =>
+                    `<div class="check-item"><span class="cb"></span>${escapeHtml(c)}</div>`,
+                )
+                .join("")
+            : '<p class="cat-note">Checklist unavailable.</p>';
+
+          // predicted performance
+          const reach = extractField(editor, "PREDICTED REACH") || "—";
+          const comments = extractField(editor, "PREDICTED COMMENTS") || "—";
+          const saves = extractField(editor, "PREDICTED SAVES") || "—";
+          $("predictRow").innerHTML = `
+      <div class="predict-metric"><div class="pm-label">Reach</div><div class="pm-val">${escapeHtml(reach)}</div></div>
+      <div class="predict-metric"><div class="pm-label">Comments</div><div class="pm-val">${escapeHtml(comments)}</div></div>
+      <div class="predict-metric"><div class="pm-label">Saves</div><div class="pm-val">${escapeHtml(saves)}</div></div>
+    `;
+
+          // health report
+          $("healthReport").innerHTML = simpleProse(
+            extractField(editor, "HEALTH REPORT"),
+          );
+
+          // deeper prompts
+          const prompts = [1, 2, 3]
+            .map((n) => extractField(editor, `DEEPER PROMPT ${n}`))
+            .filter(Boolean);
+          $("deeperPrompts").innerHTML = prompts.length
+            ? prompts
+                .map((p) => `<span class="prompt-chip">${escapeHtml(p)}</span>`)
+                .join("")
+            : '<p class="cat-note">No follow-up prompts returned.</p>';
+
+          log("Final report compiled. Review complete.", true);
+        }
+
+        function fillList(id, items) {
+          const el = $(id);
+          el.innerHTML = items.length
+            ? items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")
+            : "<li>No notes returned.</li>";
+        }
+      })();
+    </script>
+  </body>
+</html>
