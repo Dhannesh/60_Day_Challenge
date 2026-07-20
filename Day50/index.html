@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defend Your Experience</title>
+<style>
+:root{
+  --bg:#fdf9f3;
+  --bg-card:#ffffff;
+  --bg-soft:#faf3ea;
+  --ink:#2e2a25;
+  --ink-soft:#6b6258;
+  --accent:#c1694f;
+  --accent-soft:#f0d9cf;
+  --good:#5c8a5c;
+  --good-bg:#e7f0e2;
+  --warn:#c99a3e;
+  --warn-bg:#faf0dc;
+  --bad:#c1594f;
+  --bad-bg:#f7e2de;
+  --border:#e8ddd0;
+  --radius:16px;
+  --shadow: 0 4px 20px rgba(120,90,60,0.08);
+  --font-head: Georgia, 'Iowan Old Style', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.5;
+}
+.app{
+  max-width:920px;
+  margin:0 auto;
+  padding:32px 20px 80px;
+}
+.header{
+  text-align:center;
+  margin-bottom:32px;
+  animation:fadeIn .6s ease;
+}
+.header h1{
+  font-family:var(--font-head);
+  font-size:2.1rem;
+  margin:0 0 6px;
+  color:var(--ink);
+}
+.header p{
+  color:var(--ink-soft);
+  font-size:1rem;
+  margin:0;
+}
+.card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px;
+  margin-bottom:20px;
+  border:1px solid var(--border);
+  animation:fadeIn .5s ease;
+}
+@keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+/* Progress bar */
+.progress-wrap{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:24px;
+}
+.progress-track{
+  flex:1;
+  height:8px;
+  background:var(--bg-soft);
+  border-radius:8px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),#e0a084);
+  border-radius:8px;
+  transition:width .5s ease;
+}
+.progress-label{
+  font-size:.82rem;
+  color:var(--ink-soft);
+  white-space:nowrap;
+}
+
+/* Buttons */
+button{
+  font-family:var(--font-body);
+  cursor:pointer;
+  border:none;
+  border-radius:10px;
+  font-size:.95rem;
+  transition:all .15s ease;
+}
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  padding:12px 22px;
+  font-weight:600;
+}
+.btn-primary:hover{background:#a8543d; transform:translateY(-1px);}
+.btn-primary:disabled{background:#d8c5ba; cursor:not-allowed; transform:none;}
+.btn-secondary{
+  background:var(--bg-soft);
+  color:var(--ink);
+  padding:12px 20px;
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{background:var(--accent-soft);}
+.btn-ghost{
+  background:transparent;
+  color:var(--ink-soft);
+  padding:8px 14px;
+  text-decoration:underline;
+}
+
+/* Mode select cards */
+.choice-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;
+  margin-top:18px;
+}
+.choice-card{
+  background:var(--bg-soft);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.choice-card:hover{border-color:var(--accent); transform:translateY(-2px);}
+.choice-card.selected{border-color:var(--accent); background:var(--accent-soft);}
+.choice-card h3{margin:0 0 4px; font-size:1.02rem;}
+.choice-card p{margin:0; font-size:.85rem; color:var(--ink-soft);}
+
+/* Upload zone */
+.dropzone{
+  border:2px dashed var(--border);
+  border-radius:14px;
+  padding:36px 20px;
+  text-align:center;
+  color:var(--ink-soft);
+  background:var(--bg-soft);
+  transition:all .15s ease;
+  cursor:pointer;
+}
+.dropzone.dragover{border-color:var(--accent); background:var(--accent-soft);}
+.dropzone input{display:none;}
+
+/* Chat / interview area */
+.chat-log{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  margin-bottom:20px;
+}
+.msg{
+  max-width:88%;
+  padding:14px 18px;
+  border-radius:14px;
+  font-size:.96rem;
+  animation:fadeIn .3s ease;
+}
+.msg.interviewer{
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  align-self:flex-start;
+  border-bottom-left-radius:4px;
+}
+.msg.user{
+  background:var(--accent);
+  color:#fff;
+  align-self:flex-end;
+  border-bottom-right-radius:4px;
+}
+.msg .tag{
+  display:block;
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  opacity:.65;
+  margin-bottom:4px;
+}
+.msg-meta{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+.pill{
+  font-size:.72rem;
+  padding:3px 10px;
+  border-radius:20px;
+  font-weight:600;
+}
+.pill.strong{background:var(--good-bg); color:var(--good);}
+.pill.weak{background:var(--bad-bg); color:var(--bad);}
+.pill.vague{background:var(--warn-bg); color:var(--warn);}
+
+textarea.answer-input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  font-family:var(--font-body);
+  font-size:.96rem;
+  resize:vertical;
+  min-height:90px;
+  background:var(--bg-soft);
+  color:var(--ink);
+}
+textarea.answer-input:focus{outline:2px solid var(--accent-soft); border-color:var(--accent);}
+
+.input-row{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:10px;
+}
+
+.typing{
+  display:flex;
+  gap:4px;
+  padding:14px 18px;
+  align-self:flex-start;
+}
+.typing span{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--ink-soft);
+  animation:blink 1.2s infinite ease-in-out;
+}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.2;} 40%{opacity:1;}}
+
+/* Confidence dashboard */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px;
+  margin-bottom:20px;
+}
+.stat-box{
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  text-align:center;
+}
+.stat-box .num{
+  font-family:var(--font-head);
+  font-size:1.7rem;
+  color:var(--accent);
+}
+.stat-box .lbl{
+  font-size:.78rem;
+  color:var(--ink-soft);
+  margin-top:2px;
+}
+
+.claim-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.claim-row:last-child{border-bottom:none;}
+.claim-bar-track{
+  flex:1;
+  height:8px;
+  background:var(--bg-soft);
+  border-radius:6px;
+  overflow:hidden;
+}
+.claim-bar-fill{
+  height:100%;
+  border-radius:6px;
+}
+.claim-text{
+  flex:2;
+  font-size:.9rem;
+}
+.claim-score{
+  width:40px;
+  text-align:right;
+  font-weight:700;
+  font-size:.88rem;
+}
+
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--ink-soft);
+}
+.empty-state .icon{font-size:2.4rem; margin-bottom:10px;}
+
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:#fff;
+  padding:12px 22px;
+  border-radius:10px;
+  font-size:.88rem;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
+  z-index:999;
+  animation:fadeIn .3s ease;
+}
+
+.top-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+.session-history{
+  font-size:.85rem;
+  color:var(--ink-soft);
+}
+.session-history a{color:var(--accent); cursor:pointer; text-decoration:underline;}
+
+.badge-mode{
+  display:inline-block;
+  font-size:.72rem;
+  padding:4px 10px;
+  border-radius:20px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+hr.divider{border:none; border-top:1px solid var(--border); margin:22px 0;}
+
+.report-section h2{
+  font-family:var(--font-head);
+  font-size:1.3rem;
+  margin-bottom:10px;
+}
+.recommendation{
+  background:var(--bg-soft);
+  border-left:4px solid var(--accent);
+  padding:12px 16px;
+  border-radius:8px;
+  margin-bottom:10px;
+  font-size:.9rem;
+}
+
+@media(max-width:600px){
+  .app{padding:20px 14px 60px;}
+  .header h1{font-size:1.6rem;}
+  .card{padding:20px;}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ============ STATE ============ */
+const STORAGE_KEY = 'dye_sessions_v1';
+const state = {
+  screen: 'welcome', // welcome -> intake -> interview -> report
+  intakeMode: null, // 'upload' | 'talk'
+  audience: 'Academic hiring committee (CSE Faculty interview)',
+  claims: [], // {id, text, status:'untested'|'strong'|'weak'|'vague', score, evidence:[]}
+  transcript: [], // {role:'interviewer'|'user', text, tags:[]}
+  currentQuestion: null,
+  loading: false,
+  sessionId: null,
+  errorRetry: 0,
+  rawIntakeText: ''
+};
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+/* ============ PERSISTENCE ============ */
+function loadSessions(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }catch(e){ return []; }
+}
+function saveSession(){
+  const sessions = loadSessions();
+  const idx = sessions.findIndex(s=>s.id===state.sessionId);
+  const snapshot = {
+    id: state.sessionId,
+    updated: Date.now(),
+    audience: state.audience,
+    claims: state.claims,
+    transcript: state.transcript,
+    screen: state.screen
+  };
+  if(idx>=0) sessions[idx]=snapshot; else sessions.unshift(snapshot);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions.slice(0,20)));
+}
+function deleteSession(id){
+  const sessions = loadSessions().filter(s=>s.id!==id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+}
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const t = document.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+/* ============ API CALL ============ */
+async function callClaude(systemPrompt, userPrompt, retries=2){
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:"user", content:userPrompt}]
+      })
+    });
+    if(!response.ok){
+      if(response.status===429 && retries>0){
+        await new Promise(r=>setTimeout(r,1200));
+        return callClaude(systemPrompt, userPrompt, retries-1);
+      }
+      throw new Error("API error "+response.status);
+    }
+    const data = await response.json();
+    const textBlock = data.content.find(c=>c.type==="text");
+    return textBlock ? textBlock.text : "";
+  }catch(err){
+    if(retries>0){
+      await new Promise(r=>setTimeout(r,1000));
+      return callClaude(systemPrompt, userPrompt, retries-1);
+    }
+    throw err;
+  }
+}
+
+function safeParseJSON(text){
+  let clean = text.trim().replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
+  try{ return JSON.parse(clean); }catch(e){
+    const match = clean.match(/\{[\s\S]*\}/);
+    if(match){ try{ return JSON.parse(match[0]); }catch(e2){} }
+    return null;
+  }
+}
+
+/* ============ RENDER ROOT ============ */
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  app.appendChild(renderHeader());
+
+  if(state.screen==='welcome') app.appendChild(renderWelcome());
+  else if(state.screen==='intake') app.appendChild(renderIntake());
+  else if(state.screen==='interview') app.appendChild(renderInterview());
+  else if(state.screen==='report') app.appendChild(renderReport());
+}
+
+function renderHeader(){
+  const div = document.createElement('div');
+  div.className='header';
+  div.innerHTML = `
+    <h1>🛡️ Defend Your Experience</h1>
+    <p>Not resume polish — real defense. We stress-test every claim you make until you can own it under pressure.</p>
+  `;
+  return div;
+}
+
+/* ============ WELCOME ============ */
+function renderWelcome(){
+  const div = document.createElement('div');
+  div.className='card';
+  div.innerHTML = `
+    <div class="empty-state">
+      <div class="icon">🎯</div>
+      <h2 style="font-family:var(--font-head); margin-bottom:6px;">Preparing to defend a resume</h2>
+      <p>Audience: <strong>Academic hiring committee (CSE Faculty interview)</strong></p>
+      <p style="max-width:520px; margin:14px auto 0;">You'll be interviewed conversationally to surface your claims — teaching approach, research contributions, projects, credentials — and then each one gets challenged like a real committee would. Expect follow-ups that get sharper the more you say.</p>
+    </div>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn-primary" id="startBtn">Begin Interview</button>
+    </div>
+    ${renderHistoryLink()}
+  `;
+  setTimeout(()=>{
+    document.getElementById('startBtn').onclick = ()=>{
+      state.sessionId = uid();
+      state.screen='intake';
+      render();
+    };
+    const link = document.getElementById('historyLink');
+    if(link) link.onclick = renderHistoryPicker;
+  },0);
+  return div;
+}
+
+function renderHistoryLink(){
+  const sessions = loadSessions();
+  if(sessions.length===0) return '';
+  return `<div class="session-history" style="text-align:center; margin-top:16px;">
+    You have ${sessions.length} previous session(s). <a id="historyLink">View history</a>
+  </div>`;
+}
+
+function renderHistoryPicker(){
+  const sessions = loadSessions();
+  const app = document.getElementById('app');
+  const div = document.createElement('div');
+  div.className='card';
+  div.innerHTML = `<h3 style="font-family:var(--font-head);">Session History</h3>` +
+    sessions.map(s=>`
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">${new Date(s.updated).toLocaleString()}</div>
+          <div style="font-size:.82rem; color:var(--ink-soft);">${s.claims.length} claims tracked</div>
+        </div>
+        <div>
+          <button class="btn-secondary" onclick="resumeSession('${s.id}')">Resume</button>
+          <button class="btn-ghost" onclick="removeSession('${s.id}')">Delete</button>
+        </div>
+      </div>
+    `).join('') +
+    `<div style="margin-top:14px;"><button class="btn-ghost" onclick="render()">← Back</button></div>`;
+  app.appendChild(div);
+}
+window.resumeSession = function(id){
+  const s = loadSessions().find(x=>x.id===id);
+  if(!s) return;
+  state.sessionId = s.id;
+  state.claims = s.claims;
+  state.transcript = s.transcript;
+  state.screen = s.claims.length ? 'interview' : 'intake';
+  render();
+};
+window.removeSession = function(id){
+  deleteSession(id);
+  render();
+};
+
+/* ============ INTAKE ============ */
+function renderIntake(){
+  const div = document.createElement('div');
+  div.className='card';
+  div.innerHTML = `
+    <span class="badge-mode">Step 1 · Build your claim list</span>
+    <h2 style="font-family:var(--font-head); margin-top:0;">How should we gather your experience?</h2>
+    <div class="choice-grid">
+      <div class="choice-card" id="modeUpload">
+        <h3>📄 Upload a document</h3>
+        <p>Drop in your resume, CV, or bio (.txt or pasted text). We'll extract claims automatically.</p>
+      </div>
+      <div class="choice-card selected" id="modeTalk">
+        <h3>💬 Interview me directly</h3>
+        <p>No file needed — describe your teaching, research, and projects; we'll build the claim list as you talk.</p>
+      </div>
+    </div>
+    <div id="intakeBody" style="margin-top:20px;"></div>
+  `;
+  setTimeout(()=>{
+    document.getElementById('modeUpload').onclick=()=>{ state.intakeMode='upload'; refreshIntakeBody(); };
+    document.getElementById('modeTalk').onclick=()=>{ state.intakeMode='talk'; refreshIntakeBody(); };
+    state.intakeMode = state.intakeMode || 'talk';
+    refreshIntakeBody();
+  },0);
+  return div;
+}
+
+function refreshIntakeBody(){
+  document.querySelectorAll('.choice-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById(state.intakeMode==='upload'?'modeUpload':'modeTalk').classList.add('selected');
+  const body = document.getElementById('intakeBody');
+  if(state.intakeMode==='upload'){
+    body.innerHTML = `
+      <div class="dropzone" id="dropzone">
+        <div style="font-size:1.8rem;">⬆️</div>
+        <p><strong>Drag & drop</strong> a .txt file here, or click to browse</p>
+        <p style="font-size:.8rem;">Or paste text below</p>
+        <input type="file" id="fileInput" accept=".txt,.md">
+      </div>
+      <textarea class="answer-input" id="pasteArea" placeholder="...or paste your resume / bio / project text here" style="margin-top:14px;"></textarea>
+      <div class="input-row">
+        <button class="btn-primary" id="extractBtn">Extract Claims</button>
+      </div>
+    `;
+    const dz = document.getElementById('dropzone');
+    dz.onclick = ()=>document.getElementById('fileInput').click();
+    dz.ondragover = e=>{ e.preventDefault(); dz.classList.add('dragover'); };
+    dz.ondragleave = ()=> dz.classList.remove('dragover');
+    dz.ondrop = e=>{
+      e.preventDefault(); dz.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if(file) readFile(file);
+    };
+    document.getElementById('fileInput').onchange = e=>{
+      if(e.target.files[0]) readFile(e.target.files[0]);
+    };
+    document.getElementById('extractBtn').onclick = ()=>{
+      const text = document.getElementById('pasteArea').value.trim();
+      if(!text){ toast('Please paste or upload some text first.'); return; }
+      state.rawIntakeText = text;
+      extractClaimsFromText(text);
+    };
+  } else {
+    body.innerHTML = `
+      <p style="color:var(--ink-soft); font-size:.92rem;">Tell us about your teaching experience, research, projects, and credentials — write as much or as little as you like. We'll turn it into a claim list to defend.</p>
+      <textarea class="answer-input" id="talkArea" placeholder="e.g. I have 14+ years of teaching CSE, I've published IEEE-indexed papers, I train freshers in AI prompting, I hold Infosys Gold Partner Faculty recognition..." style="min-height:140px;"></textarea>
+      <div class="input-row">
+        <button class="btn-primary" id="talkExtractBtn">Build My Claim List</button>
+      </div>
+    `;
+    document.getElementById('talkExtractBtn').onclick = ()=>{
+      const text = document.getElementById('talkArea').value.trim();
+      if(!text){ toast('Tell us a bit about your experience first.'); return; }
+      state.rawIntakeText = text;
+      extractClaimsFromText(text);
+    };
+  }
+}
+
+function readFile(file){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.getElementById('pasteArea').value = e.target.result;
+    toast('File loaded — click Extract Claims');
+  };
+  reader.readAsText(file);
+}
+
+async function extractClaimsFromText(text){
+  const app = document.getElementById('app');
+  const loadingCard = document.createElement('div');
+  loadingCard.className='card';
+  loadingCard.innerHTML = `<div class="typing"><span></span><span></span><span></span></div><p style="color:var(--ink-soft);">Reading through your experience and identifying claims to defend...</p>`;
+  app.appendChild(loadingCard);
+
+  const sys = `You are an expert academic hiring committee analyst. Extract every distinct, defensible claim about the candidate's experience, skill, achievement, or credential from the text they provide. For each claim, judge whether it currently sounds strong (specific, evidenced), vague (generic, unquantified), or weak (unsupported, cliché). Return ONLY valid JSON, no preamble, no markdown fences, in this exact shape:
+{"claims":[{"text":"short paraphrase of the claim in the candidate's voice","status":"strong|weak|vague"}]}
+Extract between 5 and 10 claims. Focus on things a CSE academic hiring committee would probe: teaching philosophy/experience, research/publications/patents, industry credentials, real projects, mentorship, technical depth. Do not invent claims not implied by the text.`;
+
+  try{
+    const result = await callClaude(sys, text);
+    const parsed = safeParseJSON(result);
+    loadingCard.remove();
+    if(!parsed || !parsed.claims || !parsed.claims.length){
+      toast('Could not extract claims — try adding more detail.');
+      return;
+    }
+    state.claims = parsed.claims.map(c=>({
+      id: uid(),
+      text: c.text,
+      status: c.status || 'vague',
+      score: c.status==='strong'?70:c.status==='weak'?30:50,
+      evidence: [],
+      rounds: 0
+    }));
+    state.transcript.push({role:'interviewer', text:`Thanks — I pulled out ${state.claims.length} claims from what you shared. Now let's see how well you can defend each one in front of a real committee.`});
+    state.screen='interview';
+    saveSession();
+    render();
+    setTimeout(askNextQuestion, 400);
+  }catch(err){
+    loadingCard.innerHTML = `<p style="color:var(--bad);">Something went wrong reaching the API (${err.message}). Please try again in a moment.</p><button class="btn-secondary" onclick="location.reload()">Retry</button>`;
+  }
+}
+
+/* ============ INTERVIEW ============ */
+function renderInterview(){
+  const wrap = document.createElement('div');
+
+  const nav = document.createElement('div');
+  nav.className='top-nav';
+  const answered = state.claims.filter(c=>c.rounds>0).length;
+  const pct = state.claims.length ? Math.round((answered/state.claims.length)*100) : 0;
+  nav.innerHTML = `
+    <div class="progress-wrap" style="flex:1;">
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-label">${answered}/${state.claims.length} claims probed</div>
+    </div>
+    <button class="btn-ghost" id="finishBtn" style="margin-left:12px;">Finish & See Report</button>
+  `;
+  wrap.appendChild(nav);
+
+  const card = document.createElement('div');
+  card.className='card';
+
+  if(state.claims.length===0){
+    card.innerHTML = `<div class="empty-state"><div class="icon">🗂️</div><p>No claims yet. Something went wrong — go back and try intake again.</p></div>`;
+  } else {
+    const log = document.createElement('div');
+    log.className='chat-log';
+    log.id='chatLog';
+    state.transcript.forEach(m=>{
+      const bubble = document.createElement('div');
+      bubble.className = 'msg ' + (m.role==='interviewer' ? 'interviewer' : 'user');
+      bubble.innerHTML = `<span class="tag">${m.role==='interviewer'?'Committee':'You'}</span>${escapeHtml(m.text)}`;
+      if(m.tags && m.tags.length){
+        const meta = document.createElement('div');
+        meta.className='msg-meta';
+        m.tags.forEach(t=>{
+          const p = document.createElement('span');
+          p.className='pill '+t.type;
+          p.textContent = t.label;
+          meta.appendChild(p);
+        });
+        bubble.appendChild(meta);
+      }
+      log.appendChild(bubble);
+    });
+    if(state.loading){
+      const t = document.createElement('div');
+      t.className='typing';
+      t.innerHTML='<span></span><span></span><span></span>';
+      log.appendChild(t);
+    }
+    card.appendChild(log);
+
+    if(!state.loading){
+      const inputArea = document.createElement('div');
+      inputArea.innerHTML = `
+        <textarea class="answer-input" id="answerInput" placeholder="Respond as you would to the committee..."></textarea>
+        <div class="input-row">
+          <button class="btn-primary" id="submitAnswer">Submit Answer</button>
+        </div>
+      `;
+      card.appendChild(inputArea);
+    }
+  }
+  wrap.appendChild(card);
+
+  const sidebar = document.createElement('div');
+  sidebar.className='card';
+  sidebar.innerHTML = `<h3 style="font-family:var(--font-head); margin-top:0; font-size:1.05rem;">Confidence Tracker</h3>` +
+    state.claims.map(c=>`
+      <div class="claim-row">
+        <div class="claim-text">${escapeHtml(c.text.length>60?c.text.slice(0,60)+'…':c.text)}</div>
+        <div class="claim-bar-track"><div class="claim-bar-fill" style="width:${c.score}%; background:${barColor(c.score)}"></div></div>
+        <div class="claim-score" style="color:${barColor(c.score)}">${c.score}</div>
+      </div>
+    `).join('');
+  wrap.appendChild(sidebar);
+
+  setTimeout(()=>{
+    document.getElementById('finishBtn').onclick = ()=>{ state.screen='report'; saveSession(); render(); };
+    const submitBtn = document.getElementById('submitAnswer');
+    if(submitBtn){
+      submitBtn.onclick = handleAnswerSubmit;
+      const ta = document.getElementById('answerInput');
+      ta.focus();
+      ta.addEventListener('keydown', e=>{
+        if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) handleAnswerSubmit();
+      });
+    }
+    const log = document.getElementById('chatLog');
+    if(log) log.scrollTop = log.scrollHeight;
+  },0);
+
+  return wrap;
+}
+
+function barColor(score){
+  if(score>=70) return 'var(--good)';
+  if(score>=45) return 'var(--warn)';
+  return 'var(--bad)';
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* pick next claim to probe: least-probed, lowest score first */
+function pickNextClaim(){
+  const unprobed = state.claims.filter(c=>c.rounds===0);
+  if(unprobed.length) return unprobed[0];
+  const sorted = [...state.claims].sort((a,b)=> a.score - b.score);
+  return sorted[0];
+}
+
+async function askNextQuestion(){
+  if(state.claims.every(c=>c.rounds>=2)){
+    state.transcript.push({role:'interviewer', text:"That covers solid ground on every claim. You can keep going, or wrap up and see your Defense Report."});
+    render();
+    return;
+  }
+  const claim = pickNextClaim();
+  state.currentQuestion = claim;
+  state.loading = true;
+  render();
+
+  const history = state.transcript.slice(-6).map(m=>`${m.role.toUpperCase()}: ${m.text}`).join('\n');
+  const sys = `You are a skeptical, respectful academic hiring committee member interviewing a CSE faculty candidate. You challenge ONE specific claim at a time with a sharp, personalized follow-up question — never generic ("tell me about yourself" style) questions. Base your question directly on the claim text and the conversation so far. If the claim is vague or unsupported, push for concrete evidence, numbers, specific examples, or how they'd handle a realistic scenario testing that claim. Keep your question to 2-3 sentences, professional but pointed, as if speaking aloud in an interview. Return ONLY the question text, nothing else — no labels, no quotes.`;
+  const userPrompt = `Claim to probe: "${claim.text}"\nThis claim has been probed ${claim.rounds} time(s) so far.\nRecent conversation:\n${history}\n\nAsk your next challenging question about this specific claim.`;
+
+  try{
+    const question = await callClaude(sys, userPrompt);
+    state.transcript.push({role:'interviewer', text: question.trim()});
+  }catch(err){
+    state.transcript.push({role:'interviewer', text: `(Connection hiccup reaching the panel — let's try again.) Can you tell me more about: "${claim.text}"?`});
+  }
+  state.loading = false;
+  saveSession();
+  render();
+}
+
+async function handleAnswerSubmit(){
+  const ta = document.getElementById('answerInput');
+  const answer = ta.value.trim();
+  if(!answer){ toast('Type an answer first.'); return; }
+  state.transcript.push({role:'user', text: answer});
+  state.loading = true;
+  render();
+
+  const claim = state.currentQuestion;
+  const sys = `You are an expert behavioral psychologist and academic hiring evaluator. Evaluate the candidate's answer defending this specific claim: "${claim.text}". Judge specificity, evidence, honesty, and confidence. Return ONLY valid JSON, no markdown fences:
+{"assessment":"strong|weak|vague","score_delta":-15 to 20 (integer, how much to adjust their defense score for this claim),"tag_label":"short 2-4 word label e.g. 'Needs numbers' or 'Solid evidence'","feedback":"1-2 sentence coach feedback on this specific answer, direct and constructive"}`;
+  const userPrompt = `Claim: "${claim.text}"\nQuestion asked: "${state.transcript[state.transcript.length-2].text}"\nCandidate's answer: "${answer}"`;
+
+  try{
+    const result = await callClaude(sys, userPrompt);
+    const parsed = safeParseJSON(result);
+    if(parsed){
+      claim.score = Math.max(0, Math.min(100, claim.score + parsed.score_delta));
+      claim.status = parsed.assessment;
+      claim.rounds += 1;
+      claim.evidence.push({answer, feedback: parsed.feedback, assessment: parsed.assessment});
+      const lastMsg = state.transcript[state.transcript.length-1];
+      lastMsg.tags = [{type: parsed.assessment==='strong'?'strong':parsed.assessment==='weak'?'weak':'vague', label: parsed.tag_label}];
+      state.transcript.push({role:'interviewer', text: parsed.feedback});
+    } else {
+      claim.rounds += 1;
+    }
+  }catch(err){
+    state.transcript.push({role:'interviewer', text:"(The panel's connection dropped for a second — noted your answer, let's continue.)"});
+    claim.rounds += 1;
+  }
+  state.loading = false;
+  saveSession();
+  render();
+  setTimeout(askNextQuestion, 700);
+}
+
+/* ============ REPORT ============ */
+function renderReport(){
+  const wrap = document.createElement('div');
+
+  const overallScore = state.claims.length ? Math.round(state.claims.reduce((a,c)=>a+c.score,0)/state.claims.length) : 0;
+  const strong = state.claims.filter(c=>c.score>=70).length;
+  const shaky = state.claims.filter(c=>c.score>=45 && c.score<70).length;
+  const weak = state.claims.filter(c=>c.score<45).length;
+
+  const summary = document.createElement('div');
+  summary.className='card report-section';
+  summary.innerHTML = `
+    <span class="badge-mode">Defense Report</span>
+    <h2 style="font-family:var(--font-head); margin-top:0;">Overall Readiness: ${overallScore}/100</h2>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="num" style="color:var(--good)">${strong}</div><div class="lbl">Well Defended</div></div>
+      <div class="stat-box"><div class="num" style="color:var(--warn)">${shaky}</div><div class="lbl">Needs Polish</div></div>
+      <div class="stat-box"><div class="num" style="color:var(--bad)">${weak}</div><div class="lbl">At Risk</div></div>
+      <div class="stat-box"><div class="num">${state.transcript.filter(m=>m.role==='user').length}</div><div class="lbl">Answers Given</div></div>
+    </div>
+  `;
+  wrap.appendChild(summary);
+
+  const claimsCard = document.createElement('div');
+  claimsCard.className='card report-section';
+  claimsCard.innerHTML = `<h2>Claim-by-Claim Breakdown</h2>` +
+    state.claims.map(c=>`
+      <div class="claim-row" style="align-items:flex-start;">
+        <div class="claim-text" style="flex:3;">
+          <strong>${escapeHtml(c.text)}</strong>
+          ${c.evidence.length ? `<div style="font-size:.83rem; color:var(--ink-soft); margin-top:4px;">${escapeHtml(c.evidence[c.evidence.length-1].feedback)}</div>` : `<div style="font-size:.83rem; color:var(--ink-soft); margin-top:4px;">Not yet probed.</div>`}
+        </div>
+        <div style="flex:1; text-align:right;">
+          <div class="claim-score" style="color:${barColor(c.score)}; font-size:1.1rem;">${c.score}</div>
+          <div class="claim-bar-track" style="margin-top:6px;"><div class="claim-bar-fill" style="width:${c.score}%; background:${barColor(c.score)}"></div></div>
+        </div>
+      </div>
+    `).join('');
+  wrap.appendChild(claimsCard);
+
+  const recsCard = document.createElement('div');
+  recsCard.className='card report-section';
+  const weakClaims = state.claims.filter(c=>c.score<70);
+  recsCard.innerHTML = `<h2>Before You Face the Real Panel</h2>` +
+    (weakClaims.length===0
+      ? `<div class="recommendation">Every claim held up well. Keep your answers this concrete in the real interview — specificity is your strongest asset.</div>`
+      : weakClaims.map(c=>`
+        <div class="recommendation">
+          <strong>${escapeHtml(c.text.length>70?c.text.slice(0,70)+'…':c.text)}</strong><br>
+          Add concrete numbers, a specific example, or a named outcome. Committees discount claims that stay abstract — turn "years of experience" into a specific class, student outcome, or measurable change you drove.
+        </div>
+      `).join(''));
+  wrap.appendChild(recsCard);
+
+  const actions = document.createElement('div');
+  actions.className='card';
+  actions.style.textAlign='center';
+  actions.innerHTML = `
+    <button class="btn-primary" id="exportBtn">Export Report</button>
+    <button class="btn-secondary" id="continueBtn">Continue Defending</button>
+    <button class="btn-ghost" id="newSessionBtn">Start New Session</button>
+  `;
+  wrap.appendChild(actions);
+
+  setTimeout(()=>{
+    document.getElementById('exportBtn').onclick = exportReport;
+    document.getElementById('continueBtn').onclick = ()=>{ state.screen='interview'; render(); };
+    document.getElementById('newSessionBtn').onclick = ()=>{
+      state.sessionId = uid();
+      state.claims = [];
+      state.transcript = [];
+      state.screen='intake';
+      render();
+    };
+  },0);
+
+  return wrap;
+}
+
+function exportReport(){
+  const overallScore = state.claims.length ? Math.round(state.claims.reduce((a,c)=>a+c.score,0)/state.claims.length) : 0;
+  let text = `DEFEND YOUR EXPERIENCE — DEFENSE REPORT\nGenerated: ${new Date().toLocaleString()}\nAudience: ${state.audience}\nOverall Readiness: ${overallScore}/100\n\n`;
+  state.claims.forEach(c=>{
+    text += `CLAIM: ${c.text}\nScore: ${c.score}/100 (${c.status})\n`;
+    c.evidence.forEach(e=>{ text += `  - Answer: ${e.answer}\n    Feedback: ${e.feedback}\n`; });
+    text += `\n`;
+  });
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'defense-report.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Report exported');
+}
+
+/* ============ INIT ============ */
+render();
+</script>
+</body>
+</html>
