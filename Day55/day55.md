@@ -1,5 +1,7 @@
 ## Day 5 — Persistence, Derived Views & First Generate Button
 
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
+
 - Added temporary public write/update/delete RLS policies on timetable_slots (dev-only, locked down Day 9).
 - Hardened generator.js with swap-based backtracking; added markFree() to availability.js.
 - Built timetableService.js: generateAndPersistTimetable(), getSectionTimetable(), getFacultyTimetable(), getAllSections(), getAllFaculty().

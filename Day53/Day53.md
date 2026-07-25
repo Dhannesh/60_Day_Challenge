@@ -1,5 +1,7 @@
 ## Day 3 — Project Setup & Foundation
 
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
+
 - Verified environment: Node v24.12.0, VS Code, existing Vite (React+JS) project inside the repo.
 - Installed Tailwind CSS v4, Supabase JS client, and React Router; configured and visually verified Tailwind.
 - Built out the full folder structure per PROJECT-STRUCTURE.md (corrected 6 component files from .js to .jsx).

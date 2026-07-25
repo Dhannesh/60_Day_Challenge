@@ -1,5 +1,6 @@
 # Smart Timetable Auto-Generator with AI Reassignment Agent
 
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
 A rule-based timetable auto-generation engine for a college department, paired with an AI agent that resolves faculty-absence disruptions through natural-language requests.
 
 Built as a 10-day capstone project for the **AB Talks 60-Day Claude AI Mastery Challenge**.

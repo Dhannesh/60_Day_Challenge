@@ -1,6 +1,7 @@
 # API Design — Smart Timetable Auto-Generator
 
 Status: Finalized Day 2. No implementation yet — this is the contract Days 4–8 will build against.
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
 
 ## Note on Architecture
 

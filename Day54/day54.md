@@ -1,5 +1,7 @@
 ## Prompt
 
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
+
 ```
 DAY 4: Core Feature Implementation
 
