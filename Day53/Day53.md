@@ -12,6 +12,7 @@
 
 ## Prompt
 
+```
 Day 3: Project Setup & Foundation
 
 Today is Day 3, continuing the same capstone. Before doing anything, read the following documents from the previous days:
@@ -134,3 +135,4 @@ Finally, summarize:
 - 🎯 What tomorrow's objective will be
 
 Tomorrow should begin implementing the first major user-facing feature, with no additional setup or planning required.
+```
