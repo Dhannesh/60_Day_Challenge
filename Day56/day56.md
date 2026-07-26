@@ -1,3 +1,5 @@
+### Github Repo https://github.com/Dhannesh/smart-timetable-automator
+
 ## Prompt
 
 ```
